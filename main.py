@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import shutil
 import subprocess
@@ -6,7 +7,7 @@ import tempfile
 
 import httpx
 import yt_dlp
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 
@@ -114,6 +115,9 @@ def is_hls_url(url: str) -> bool:
     return "m3u8" in url or "mpd" in url
 
 
+# ─────────────────────────────────────────────
+#  SEARCH
+# ─────────────────────────────────────────────
 @app.get("/search")
 async def search(q: str = Query(...), limit: int = 10):
     try:
@@ -140,6 +144,9 @@ async def search(q: str = Query(...), limit: int = 10):
         raise HTTPException(status_code=400, detail=f"Pencarian gagal: {str(e)}")
 
 
+# ─────────────────────────────────────────────
+#  STREAM URL
+# ─────────────────────────────────────────────
 @app.get("/stream-url")
 async def get_stream_url(url: str = Query(...)):
     if "soundcloud.com" not in url:
@@ -181,6 +188,9 @@ async def get_stream_url(url: str = Query(...)):
         raise HTTPException(status_code=500, detail=f"Gagal mengambil stream URL: {str(e)}")
 
 
+# ─────────────────────────────────────────────
+#  PROXY AUDIO
+# ─────────────────────────────────────────────
 @app.get("/proxy-audio")
 async def proxy_audio(url: str = Query(...)):
     if "soundcloud.com" not in url:
@@ -217,7 +227,7 @@ async def proxy_audio(url: str = Query(...)):
                             yield chunk
             return StreamingResponse(stream_fallback(), media_type="audio/mpeg")
 
-        # HLS: download dulu via yt-dlp ke tmpdir
+        # HLS → download via yt-dlp ke tmpdir
         with tempfile.TemporaryDirectory() as tmpdir:
             dl_opts = base_ydl_opts()
             dl_opts["format"] = "bestaudio/best"
@@ -258,6 +268,9 @@ async def proxy_audio(url: str = Query(...)):
         raise HTTPException(status_code=500, detail=f"Proxy gagal: {str(e)}")
 
 
+# ─────────────────────────────────────────────
+#  AUDIO DOWNLOAD
+# ─────────────────────────────────────────────
 @app.get("/audio")
 async def get_audio(url: str = Query(...)):
     if "soundcloud.com" not in url:
@@ -305,3 +318,90 @@ async def get_audio(url: str = Query(...)):
         if path and os.path.exists(path):
             os.remove(path)
         raise HTTPException(status_code=500, detail=f"Gagal: {str(e)}")
+
+
+# ─────────────────────────────────────────────
+#  ROBLOX UPLOAD  ← lewat backend, bebas CORS
+# ─────────────────────────────────────────────
+@app.post("/roblox-upload")
+async def roblox_upload(
+    file: UploadFile = File(...),
+    api_key: str = Form(...),
+    creator_id: str = Form(...),
+    creator_type: str = Form(...),
+    asset_name: str = Form(...),
+):
+    """
+    Proxy upload ke Roblox Open Cloud API.
+    Browser tidak bisa hit apis.roblox.com langsung karena CORS,
+    jadi kita kirim dari server ini.
+    """
+    request_body = {
+        "assetType": "Audio",
+        "displayName": asset_name[:50],
+        "description": "Uploaded via Ever Dream Studio",
+        "creationContext": {
+            "creator": (
+                {"groupId": int(creator_id)}
+                if creator_type == "Group"
+                else {"userId": int(creator_id)}
+            )
+        }
+    }
+
+    file_bytes = await file.read()
+    content_type = file.content_type or "audio/mpeg"
+
+    try:
+        async with httpx.AsyncClient(timeout=90) as client:
+            response = await client.post(
+                "https://apis.roblox.com/assets/v1/assets",
+                headers={"x-api-key": api_key},
+                files={
+                    "request": (None, json.dumps(request_body), "application/json"),
+                    "fileContent": (file.filename, file_bytes, content_type),
+                }
+            )
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Timeout saat menghubungi Roblox API")
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Gagal menghubungi Roblox API: {str(e)}")
+
+    if not response.is_success:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Roblox error {response.status_code}: {response.text}"
+        )
+
+    return JSONResponse(response.json())
+
+
+# ─────────────────────────────────────────────
+#  ROBLOX POLL OPERATION
+# ─────────────────────────────────────────────
+@app.get("/roblox-poll")
+async def roblox_poll(
+    op_path: str = Query(...),
+    api_key: str = Query(...),
+):
+    """
+    Poll status operasi async Roblox (upload audio bisa async).
+    """
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(
+                f"https://apis.roblox.com/assets/{op_path}",
+                headers={"x-api-key": api_key}
+            )
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Timeout saat polling Roblox")
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Poll error: {str(e)}")
+
+    if not response.is_success:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Poll error {response.status_code}: {response.text}"
+        )
+
+    return JSONResponse(response.json())
