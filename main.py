@@ -64,6 +64,7 @@ def get_ydl_opts(extra={}):
         'quiet': True,
         'no_warnings': True,
         'cookiefile': get_cookie_file(),
+        'format': 'bestaudio/best',
         'extractor_args': {
             'youtube': {
                 'player_client': ['web', 'tv_embedded', 'ios'],
@@ -80,15 +81,26 @@ def get_ydl_opts(extra={}):
 def pick_stream_url(info: dict) -> str:
     formats = info.get('formats') or []
 
-    # Prioritas 1: audio only webm/m4a
-    for fmt in reversed(formats):
-        if fmt.get('acodec') != 'none' and fmt.get('vcodec') == 'none' and fmt.get('url'):
-            return fmt['url']
+    # Prioritas 1: audio only (opus/m4a/webm), ambil bitrate tertinggi
+    audio_only = [
+        f for f in formats
+        if f.get('acodec') != 'none'
+        and f.get('vcodec') in ('none', None)
+        and f.get('url')
+    ]
+    if audio_only:
+        # sort by abr (audio bitrate), ambil tertinggi
+        audio_only.sort(key=lambda f: f.get('abr') or f.get('tbr') or 0)
+        return audio_only[-1]['url']
 
     # Prioritas 2: format apapun yang punya audio
-    for fmt in reversed(formats):
-        if fmt.get('acodec') != 'none' and fmt.get('url'):
-            return fmt['url']
+    with_audio = [
+        f for f in formats
+        if f.get('acodec') != 'none' and f.get('url')
+    ]
+    if with_audio:
+        with_audio.sort(key=lambda f: f.get('abr') or f.get('tbr') or 0)
+        return with_audio[-1]['url']
 
     # Prioritas 3: url langsung dari info
     if info.get('url'):
