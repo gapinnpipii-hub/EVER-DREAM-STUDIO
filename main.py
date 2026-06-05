@@ -116,6 +116,14 @@ def is_hls_url(url: str) -> bool:
 
 
 # ─────────────────────────────────────────────
+#  HEALTH CHECK
+# ─────────────────────────────────────────────
+@app.get("/")
+async def health():
+    return {"status": "ok", "ffmpeg": FFMPEG_PATH is not None}
+
+
+# ─────────────────────────────────────────────
 #  SEARCH
 # ─────────────────────────────────────────────
 @app.get("/search")
@@ -331,11 +339,6 @@ async def roblox_upload(
     creator_type: str = Form(...),
     asset_name: str = Form(...),
 ):
-    """
-    Proxy upload ke Roblox Open Cloud API.
-    Browser tidak bisa hit apis.roblox.com langsung karena CORS,
-    jadi kita kirim dari server ini.
-    """
     request_body = {
         "assetType": "Audio",
         "displayName": asset_name[:50],
@@ -384,9 +387,6 @@ async def roblox_poll(
     op_path: str = Query(...),
     api_key: str = Query(...),
 ):
-    """
-    Poll status operasi async Roblox (upload audio bisa async).
-    """
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.get(
@@ -405,3 +405,12 @@ async def roblox_poll(
         )
 
     return JSONResponse(response.json())
+
+
+# ─────────────────────────────────────────────
+#  ENTRY POINT
+# ─────────────────────────────────────────────
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
