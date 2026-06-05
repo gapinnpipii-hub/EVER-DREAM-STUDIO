@@ -1,7 +1,30 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
-import yt_dlp, os, re, httpx, tempfile
+import yt_dlp, os, re, httpx, tempfile, shutil, subprocess
+
+def find_ffmpeg():
+    # Coba which dulu
+    path = shutil.which('ffmpeg')
+    if path:
+        return os.path.dirname(path)
+    # Coba path umum Nix di Railway
+    for p in ['/usr/bin', '/usr/local/bin', '/nix/var/nix/profiles/default/bin', '/root/.nix-profile/bin']:
+        if os.path.exists(os.path.join(p, 'ffmpeg')):
+            return p
+    # Coba find
+    try:
+        result = subprocess.run(['find', '/nix', '-name', 'ffmpeg', '-type', 'f'], 
+                                capture_output=True, text=True, timeout=5)
+        lines = [l.strip() for l in result.stdout.strip().split('\n') if l.strip()]
+        if lines:
+            return os.path.dirname(lines[0])
+    except Exception:
+        pass
+    return None
+
+FFMPEG_PATH = find_ffmpeg()
+print(f"[startup] ffmpeg location: {FFMPEG_PATH}")
 
 app = FastAPI()
 
@@ -148,7 +171,8 @@ async def get_audio(url: str = Query(...)):
         opts['format'] = 'bestaudio/best'
         opts['outtmpl'] = '/tmp/%(id)s.%(ext)s'
         opts['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]
-        opts['ffmpeg_location'] = '/usr/bin'
+        if FFMPEG_PATH:
+            opts['ffmpeg_location'] = FFMPEG_PATH
 
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=True)
