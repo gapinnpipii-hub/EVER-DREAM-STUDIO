@@ -16,20 +16,19 @@ def extract_video_id(url: str):
     m = re.search(r'(?:v=|youtu\.be/|shorts/)([a-zA-Z0-9_-]{11})', url)
     return m.group(1) if m else None
 
-# YDL options anti-bot
 def get_ydl_opts(extra={}):
     opts = {
         'quiet': True,
         'no_warnings': True,
+        # tv_embedded paling jarang diblock YouTube
         'extractor_args': {
             'youtube': {
-                'player_client': ['android', 'web'],
+                'player_client': ['tv_embedded', 'ios'],
+                'player_skip': ['webpage', 'configs'],
             }
         },
         'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version',
         },
     }
     opts.update(extra)
@@ -83,7 +82,7 @@ async def get_stream_url(url: str = Query(...)):
             )
             stream_url = (audio_fmt or {}).get('url') or info.get('url')
             if not stream_url:
-                raise HTTPException(status_code=500, detail="Tidak dapat menemukan stream URL")
+                raise HTTPException(status_code=500, detail="Stream URL tidak ditemukan")
 
             return JSONResponse({
                 "stream_url": stream_url,
@@ -97,8 +96,7 @@ async def get_stream_url(url: str = Query(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil stream URL: {str(e)}")
 
-# ── AUDIO PROXY (backend yang fetch stream, bukan browser) ──
-# Ini menghindari CORS block saat browser coba fetch YouTube CDN langsung
+# ── PROXY AUDIO ──
 @app.get("/proxy-audio")
 async def proxy_audio(url: str = Query(...)):
     if not extract_video_id(url):
@@ -120,25 +118,22 @@ async def proxy_audio(url: str = Query(...)):
             if not stream_url:
                 raise HTTPException(status_code=500, detail="Stream URL tidak ditemukan")
 
-        # Backend proxy stream ke client
         async def stream_audio():
-            async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=120, follow_redirects=True) as client:
                 async with client.stream("GET", stream_url, headers={
-                    "User-Agent": "Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+                    "User-Agent": "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version",
                     "Referer": "https://www.youtube.com/",
-                    "Origin": "https://www.youtube.com",
                 }) as r:
                     async for chunk in r.aiter_bytes(chunk_size=65536):
                         yield chunk
 
         return StreamingResponse(stream_audio(), media_type="audio/webm")
-
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Proxy gagal: {str(e)}")
 
-# ── AUDIO DOWNLOAD (MP3 via ffmpeg) ──
+# ── AUDIO DOWNLOAD MP3 ──
 @app.get("/audio")
 async def get_audio(url: str = Query(...)):
     if not extract_video_id(url):
@@ -155,7 +150,7 @@ async def get_audio(url: str = Query(...)):
             path = f"/tmp/{info['id']}.mp3"
 
         if not os.path.exists(path):
-            raise HTTPException(status_code=500, detail="File tidak ditemukan setelah download")
+            raise HTTPException(status_code=500, detail="File tidak ditemukan")
 
         def iterfile():
             try:
