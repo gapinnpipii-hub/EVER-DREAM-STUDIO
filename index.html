@@ -1080,31 +1080,49 @@ async function selectYT(idx, r) {
 
   selectedYT = r;
   showSelectedTrack(r);
-  setStatus('Mengambil audio dari server...');
   $('processBtn').disabled = true;
   $('progWrap').style.display = 'block';
-  setP(10, 'Menghubungi backend...');
+  setP(10, 'Mendapatkan stream URL...');
 
   try {
-    const res = await fetch(`${API}/audio?url=${encodeURIComponent(r.url)}&quality=128`);
-    if (!res.ok) throw new Error(`Backend error ${res.status}`);
-    setP(50, 'Mendekode audio...');
-    const arrayBuf = await res.arrayBuffer();
+    // Step 1: get direct stream URL from backend (fast, no download)
+    const infoRes = await fetch(`${API}/stream-url?url=${encodeURIComponent(r.url)}`);
+    if (!infoRes.ok) {
+      const err = await infoRes.json().catch(() => ({}));
+      throw new Error(err.detail || `Backend error ${infoRes.status}`);
+    }
+    const info = await infoRes.json();
+
+    // Update selected track display with real info
+    if (info.title) {
+      $('selTitle').textContent = info.title;
+      $('selMeta').textContent = (info.channel || '') + (info.duration ? ' · ' + info.duration : '');
+      if (info.thumbnail) $('selThumb').src = info.thumbnail;
+    }
+
+    setP(30, 'Mengunduh audio langsung...');
+
+    // Step 2: fetch audio directly from YouTube CDN stream URL
+    const audioRes = await fetch(info.stream_url);
+    if (!audioRes.ok) throw new Error(`Stream fetch gagal: ${audioRes.status}`);
+
+    setP(70, 'Mendekode audio...');
+    const arrayBuf = await audioRes.arrayBuffer();
     const actx = new (window.AudioContext || window.webkitAudioContext)();
     audioBuffer = await actx.decodeAudioData(arrayBuf);
+
     setP(100, 'Siap — ' + audioBuffer.duration.toFixed(1) + 's');
     $('progWrap').style.display = 'none';
     $('processBtn').disabled = false;
     updateInfo();
     drawWaveform(audioBuffer);
     toast('✅ Audio berhasil dimuat — siap diproses!');
-    // scroll to processor
     setTimeout(() => $('processorSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
   } catch(e) {
     setP(0, '');
     $('progWrap').style.display = 'none';
     setStatus('❌ Gagal: ' + e.message);
-    toast('Gagal mengambil audio: ' + e.message, 4000);
+    toast('Gagal: ' + e.message, 5000);
   }
 }
 
