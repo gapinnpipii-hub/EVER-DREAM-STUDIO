@@ -12,7 +12,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# ── COOKIES (embedded langsung, tidak perlu file eksternal) ──
 COOKIES_CONTENT = """# Netscape HTTP Cookie File
 # https://curl.haxx.se/rfc/cookie_spec.html
 # This is a generated file! Do not edit.
@@ -40,7 +39,6 @@ COOKIES_CONTENT = """# Netscape HTTP Cookie File
 .youtube.com	TRUE	/	TRUE	1796158755	__Secure-ROLLOUT_TOKEN	CM7y24jjuLX2VBDoupeJve6UAxjHuq2Jve6UAw%3D%3D
 """
 
-# Tulis cookies ke file temporer saat startup
 _COOKIE_FILE = None
 
 def get_cookie_file():
@@ -59,12 +57,11 @@ def extract_video_id(url: str):
     m = re.search(r'(?:v=|youtu\.be/|shorts/)([a-zA-Z0-9_-]{11})', url)
     return m.group(1) if m else None
 
-def get_ydl_opts(extra={}):
-    opts = {
+def base_ydl_opts():
+    return {
         'quiet': True,
         'no_warnings': True,
         'cookiefile': get_cookie_file(),
-        'format': 'bestaudio/best',
         'extractor_args': {
             'youtube': {
                 'player_client': ['web', 'tv_embedded', 'ios'],
@@ -75,34 +72,31 @@ def get_ydl_opts(extra={}):
             'Accept-Language': 'en-US,en;q=0.9',
         },
     }
-    opts.update(extra)
-    return opts
 
 def pick_stream_url(info: dict) -> str:
     formats = info.get('formats') or []
 
-    # Prioritas 1: audio only (opus/m4a/webm), ambil bitrate tertinggi
+    # Prioritas 1: audio only, sort by bitrate tertinggi
     audio_only = [
         f for f in formats
-        if f.get('acodec') != 'none'
-        and f.get('vcodec') in ('none', None)
+        if f.get('acodec') not in (None, 'none')
+        and f.get('vcodec') in (None, 'none')
         and f.get('url')
     ]
     if audio_only:
-        # sort by abr (audio bitrate), ambil tertinggi
         audio_only.sort(key=lambda f: f.get('abr') or f.get('tbr') or 0)
         return audio_only[-1]['url']
 
-    # Prioritas 2: format apapun yang punya audio
+    # Prioritas 2: ada audio apapun
     with_audio = [
         f for f in formats
-        if f.get('acodec') != 'none' and f.get('url')
+        if f.get('acodec') not in (None, 'none') and f.get('url')
     ]
     if with_audio:
         with_audio.sort(key=lambda f: f.get('abr') or f.get('tbr') or 0)
         return with_audio[-1]['url']
 
-    # Prioritas 3: url langsung dari info
+    # Prioritas 3: url langsung
     if info.get('url'):
         return info['url']
 
@@ -113,10 +107,9 @@ def pick_stream_url(info: dict) -> str:
 @app.get("/search")
 async def search(q: str = Query(...), limit: int = 10):
     try:
-        opts = get_ydl_opts({
-            'skip_download': True,
-            'extract_flat': True,
-        })
+        opts = base_ydl_opts()
+        opts['skip_download'] = True
+        opts['extract_flat'] = True
         with yt_dlp.YoutubeDL(opts) as ydl:
             results = ydl.extract_info(f"ytsearch{limit}:{q}", download=False)
             items = []
@@ -144,7 +137,11 @@ async def get_stream_url(url: str = Query(...)):
     if not extract_video_id(url):
         raise HTTPException(status_code=400, detail="URL YouTube tidak valid")
     try:
-        opts = get_ydl_opts({'skip_download': True})
+        # Tidak pakai format restriction — biarkan yt-dlp ambil semua, kita pilih manual
+        opts = base_ydl_opts()
+        opts['skip_download'] = True
+        # JANGAN set 'format' di sini, biarkan default (ambil semua)
+
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=False)
             stream_url = pick_stream_url(info)
@@ -169,7 +166,9 @@ async def proxy_audio(url: str = Query(...)):
     if not extract_video_id(url):
         raise HTTPException(status_code=400, detail="URL tidak valid")
     try:
-        opts = get_ydl_opts({'skip_download': True})
+        opts = base_ydl_opts()
+        opts['skip_download'] = True
+
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=False)
             stream_url = pick_stream_url(info)
@@ -199,11 +198,11 @@ async def get_audio(url: str = Query(...)):
         raise HTTPException(status_code=400, detail="URL YouTube tidak valid")
     path = None
     try:
-        opts = get_ydl_opts({
-            'format': 'bestaudio/best',
-            'outtmpl': '/tmp/%(id)s.%(ext)s',
-            'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
-        })
+        opts = base_ydl_opts()
+        opts['format'] = 'bestaudio/best'
+        opts['outtmpl'] = '/tmp/%(id)s.%(ext)s'
+        opts['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]
+
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=True)
             path = f"/tmp/{info['id']}.mp3"
