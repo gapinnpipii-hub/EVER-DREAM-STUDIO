@@ -1,8 +1,11 @@
 [phases.setup]
 nixPkgs = ["ffmpeg"]
 
-[phases.build]
+[phases.install]
 cmds = ["pip install -r requirements.txt"]
 
+[phases.build]
+cmds = ["ln -sf $(which ffmpeg) /usr/local/bin/ffmpeg || true", "ln -sf $(which ffprobe) /usr/local/bin/ffprobe || true"]
+
 [start]
-cmd = "which ffmpeg && ffmpeg -version && uvicorn main:app --host 0.0.0.0 --port $PORT"
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
