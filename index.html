@@ -9,32 +9,19 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/soundtouch.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <style>
 :root {
-  --bg: #0d0b1a;
-  --bg2: #0f0d1e;
-  --surface: #13111f;
-  --card-solid: #171526;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.12);
-  --accent: #7864ff;
-  --accent2: #b0aaff;
-  --green: #1db954;
-  --red: #ff4757;
-  --text: #ffffff;
-  --text2: rgba(255,255,255,0.55);
-  --text3: rgba(255,255,255,0.2);
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-  --display: 'Syne', sans-serif;
-  --player-h: 84px;
-  --sidebar-w: 250px;
+  --bg:#0d0b1a;--bg2:#0f0d1e;--surface:#13111f;--card-solid:#171526;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --accent:#7864ff;--accent2:#b0aaff;--green:#1db954;--red:#ff4757;
+  --text:#ffffff;--text2:rgba(255,255,255,0.55);--text3:rgba(255,255,255,0.2);
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;--display:'Syne',sans-serif;
+  --player-h:84px;--sidebar-w:250px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-
-/* ── BACKGROUND MOTIF (from mockup) ── */
 .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}
 .bg-base{position:absolute;inset:0;background:#0d0b1a}
 .bg-g1{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 80% 10%,rgba(120,80,255,0.22) 0%,transparent 60%)}
@@ -44,10 +31,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .bg-mesh{position:absolute;inset:0;background-image:linear-gradient(rgba(140,120,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(140,120,255,0.05) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse 90% 90% at 60% 40%,black 30%,transparent 80%)}
 .bg-lines{position:absolute;inset:0;overflow:hidden;opacity:0.06}
 .bg-lines svg{width:100%;height:100%}
-
 .app{position:relative;z-index:1;display:grid;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:1fr var(--player-h);height:100vh;overflow:hidden}
-
-/* ── SIDEBAR ── */
 .sidebar{grid-row:1/2;background:rgba(10,8,22,0.75);border-right:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(16px)}
 .sidebar-top{padding:22px 16px 18px;flex-shrink:0}
 .logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(232,201,106,0.18)}
@@ -75,8 +59,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .sidebar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#b090ff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--display);flex-shrink:0}
 .sidebar-uname{font-size:12px;font-weight:600;color:var(--text)}
 .sidebar-urole{font-size:10px;font-family:var(--mono);color:var(--accent2);letter-spacing:.04em}
-
-/* ── MAIN ── */
 .main{grid-row:1/2;overflow:hidden;display:flex;flex-direction:column}
 .topbar{display:flex;align-items:center;gap:12px;padding:18px 22px 12px;flex-shrink:0;position:relative;z-index:10}
 .search-wrap{flex:1;position:relative;max-width:400px}
@@ -89,12 +71,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .search-clear.visible{display:block}
 .status-badge{display:flex;align-items:center;gap:6px;padding:6px 13px;background:rgba(29,185,84,0.08);border:1px solid rgba(29,185,84,0.2);border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono);color:#1db954;letter-spacing:.06em;margin-left:auto}
 .status-dot{width:5px;height:5px;border-radius:50%;background:#1db954;box-shadow:0 0 5px #1db954;animation:pulse 2s ease-in-out infinite}
-
-/* ── PANELS ── */
 .panel{display:none;flex:1;overflow:hidden}
 .panel.active{display:flex;flex-direction:column}
-
-/* SEARCH PANEL */
 .search-hero{padding:0 22px 14px;flex-shrink:0}
 .search-hero h1{font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:3px}
 .search-hero p{font-size:12px;color:var(--text2)}
@@ -104,8 +82,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .results-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 .list-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px}
 .list-hd span{font-size:10px;font-family:var(--mono);color:rgba(255,255,255,0.4);letter-spacing:.08em;text-transform:uppercase}
-
-/* Track row */
 .track-row{display:grid;grid-template-columns:32px 48px 1fr auto;align-items:center;gap:12px;padding:7px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:background .15s;position:relative}
 .track-row:hover{background:rgba(255,255,255,0.04)}
 .track-row.playing{background:rgba(120,100,255,0.1);border-color:rgba(120,100,255,0.22)}
@@ -114,7 +90,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .track-play-icon{position:absolute;left:16px;font-size:14px;color:var(--text2);opacity:0;transition:opacity .15s}
 .track-row.playing .track-play-icon{color:var(--accent2)}
 .track-row:hover .track-play-icon,.track-row.playing .track-play-icon{opacity:1}
-.track-thumb{width:42px;height:42px;border-radius:8px;flex-shrink:0;object-fit:cover;background:var(--card-solid);display:flex;align-items:center;justify-content:center;font-size:18px;color:rgba(255,255,255,0.2);position:relative;overflow:hidden}
+.track-thumb{width:42px;height:42px;border-radius:8px;flex-shrink:0;background:var(--card-solid);display:flex;align-items:center;justify-content:center;font-size:18px;color:rgba(255,255,255,0.2);position:relative;overflow:hidden}
 .track-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .track-info{min-width:0}
 .track-title{font-size:13px;font-weight:600;color:#f0f0fa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em;margin-bottom:2px}
@@ -122,49 +98,35 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .track-artist{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track-right{display:flex;align-items:center;gap:7px}
 .track-dur{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.45);white-space:nowrap}
-
-/* Process button (replaces Download) */
 .btn-process{display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:100px;background:rgba(120,100,255,0.14);border:1px solid rgba(120,100,255,0.28);color:var(--accent2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--sans);transition:all .2s}
 .btn-process:hover{background:rgba(120,100,255,0.28);border-color:rgba(120,100,255,0.5);color:#fff}
 .btn-process i{font-size:12px}
-.btn-process.loading{opacity:.7;pointer-events:none}
-
-/* Loading indicator on process btn */
+.btn-process.loading{opacity:.6;pointer-events:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;animation:spin .7s linear infinite}
-
-/* EMPTY / SKELETON */
 .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;text-align:center}
 .empty-icon{width:70px;height:70px;background:rgba(255,255,255,0.04);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--text3);margin-bottom:4px}
 .empty-state h3{font-family:var(--display);font-size:18px;font-weight:700}
 .empty-state p{font-size:13px;color:var(--text2);line-height:1.6}
 .skel{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* ── UPLOAD PANEL ── */
 #panel-upload{overflow-y:auto;padding:0 22px 20px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent}
 #panel-upload::-webkit-scrollbar{width:3px}
 #panel-upload::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 .upload-hero{margin-bottom:16px;flex-shrink:0}
 .upload-hero h1{font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:3px}
 .upload-hero p{font-size:12px;color:var(--text2)}
-
-/* Source indicator on upload panel when from search */
 .from-search-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(120,100,255,0.1);border:1px solid rgba(120,100,255,0.25);border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--accent2);letter-spacing:.06em;margin-top:6px;width:fit-content}
-
 .dropzone{border:2px dashed rgba(120,100,255,0.3);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(120,100,255,0.03);margin-bottom:16px;flex-shrink:0;position:relative;overflow:hidden}
 .dropzone:hover,.dropzone.drag{border-color:var(--accent);background:rgba(120,100,255,0.08)}
 .dropzone-icon{width:56px;height:56px;margin:0 auto 14px;background:rgba(120,100,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent2)}
 .dropzone h3{font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:5px}
 .dropzone p{font-size:12px;color:var(--text2);margin-bottom:5px}
 .dropzone small{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.06em}
-
-/* Fetching overlay on dropzone */
-.fetch-overlay{position:absolute;inset:0;background:rgba(13,11,26,0.85);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:12px}
+.fetch-overlay{position:absolute;inset:0;background:rgba(13,11,26,0.88);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:12px}
 .fetch-overlay.show{display:flex}
-.fetch-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--accent2)}
+.fetch-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--accent2);text-align:center;padding:0 16px}
 .fetch-sub{font-size:11px;font-family:var(--mono);color:var(--text3)}
-
 .selected-file{display:none;align-items:center;gap:12px;padding:12px 16px;background:rgba(120,100,255,0.08);border:1.5px solid rgba(120,100,255,0.2);border-radius:12px;margin-bottom:14px}
 .selected-file.show{display:flex}
 .sf-icon{width:40px;height:40px;background:rgba(120,100,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent2);flex-shrink:0}
@@ -173,19 +135,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .sf-meta{font-size:10px;font-family:var(--mono);color:var(--text3)}
 .btn-clear-file{background:none;border:none;color:var(--text3);cursor:pointer;font-size:17px;padding:5px;border-radius:50%;transition:all .2s;display:flex;align-items:center;justify-content:center}
 .btn-clear-file:hover{color:var(--red);background:rgba(255,71,87,0.1)}
-
 .wave-wrap{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px}
 canvas{width:100%;height:56px;display:block;border-radius:6px}
-
 .chips{display:none;gap:10px;margin-bottom:14px}
 .chips.show{display:flex}
 .chip{flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
 .chip-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
 .chip-val{font-size:15px;font-weight:800;font-family:var(--mono)}
-
 .section-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:16px}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
 .controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .ctrl-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:14px}
 .ctrl-card.full{grid-column:1/-1}
@@ -204,7 +162,7 @@ select{width:100%;padding:7px 10px;background:rgba(255,255,255,0.05);border:1px 
 .prog-wrap{height:2px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;display:none;margin-bottom:8px}
 .prog-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#a78bfa);border-radius:100px;transition:width .3s}
 .status-txt{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;margin-bottom:12px;min-height:14px}
-.btn-main{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#a78bfa);border:none;border-radius:12px;color:#fff;font-family:var(--display);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;box-shadow:0 6px 24px rgba(120,100,255,0.3);position:relative;overflow:hidden}
+.btn-main{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#a78bfa);border:none;border-radius:12px;color:#fff;font-family:var(--display);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;box-shadow:0 6px 24px rgba(120,100,255,0.3)}
 .btn-main:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(120,100,255,0.4)}
 .btn-main:active{transform:translateY(0)}
 .btn-main:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
@@ -225,8 +183,6 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
 .btn-dl-a:hover{background:rgba(120,100,255,0.2)}
 .btn-dl-b{background:rgba(29,185,84,0.1);border-color:rgba(29,185,84,0.3);color:#1db954}
 .btn-dl-b:hover{background:rgba(29,185,84,0.2)}
-
-/* ── INFO PANEL ── */
 .footer-panel{overflow-y:auto;padding:0 22px 20px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent}
 .footer-panel::-webkit-scrollbar{width:3px}
 .footer-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
@@ -258,12 +214,10 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
 .server-card-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
 .server-card-name{font-family:var(--display);font-size:14px;font-weight:800;color:var(--text)}
 .server-card-arrow{color:var(--text3);font-size:17px}
-
-/* ── PLAYER ── */
 .player{grid-column:1/-1;grid-row:2/3;background:rgba(10,8,22,0.88);border-top:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(16px);display:grid;grid-template-columns:1fr 2fr 1fr;align-items:center;padding:0 22px;gap:12px}
 .player-track{display:flex;align-items:center;gap:11px;min-width:0}
-.player-thumb{width:40px;height:40px;border-radius:7px;object-fit:cover;background:rgba(120,100,255,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:rgba(255,255,255,0.2)}
-.player-thumb img{width:100%;height:100%;object-fit:cover;border-radius:7px}
+.player-thumb{width:40px;height:40px;border-radius:7px;background:rgba(120,100,255,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:rgba(255,255,255,0.2);overflow:hidden}
+.player-thumb img{width:100%;height:100%;object-fit:cover}
 .player-info{min-width:0}
 .player-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .player-artist{font-size:11px;color:var(--text2)}
@@ -283,11 +237,8 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
 .vol-wrap{display:flex;align-items:center;gap:8px}
 .vol-icon{color:rgba(255,255,255,0.4);font-size:15px}
 .vol-slider{width:70px}
-
-/* ── TOAST ── */
 .toast{position:fixed;bottom:calc(var(--player-h) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--card-solid);border:1px solid var(--border2);border-radius:100px;padding:10px 20px;font-size:12px;font-weight:600;box-shadow:0 10px 32px rgba(0,0,0,0.5);transition:all .35s cubic-bezier(.16,1,.3,1);z-index:9999;opacity:0;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .3s cubic-bezier(.16,1,.3,1) both}
@@ -295,14 +246,9 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
 </head>
 <body>
 
-<!-- BACKGROUND MOTIF -->
 <div class="bg-layer">
-  <div class="bg-base"></div>
-  <div class="bg-g1"></div>
-  <div class="bg-g2"></div>
-  <div class="bg-g3"></div>
-  <div class="bg-g4"></div>
-  <div class="bg-mesh"></div>
+  <div class="bg-base"></div><div class="bg-g1"></div><div class="bg-g2"></div>
+  <div class="bg-g3"></div><div class="bg-g4"></div><div class="bg-mesh"></div>
   <div class="bg-lines">
     <svg viewBox="0 0 1200 768" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <circle cx="900" cy="120" r="280" fill="none" stroke="rgba(160,130,255,0.5)" stroke-width="0.5"/>
@@ -318,8 +264,6 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
 </div>
 
 <div class="app">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-top">
       <div class="logo-wrap">
@@ -330,47 +274,31 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
         </div>
       </div>
       <nav class="nav">
-        <button class="nav-item active" onclick="switchTab('search')">
-          <i class="ti ti-search"></i> Cari Musik
-        </button>
-        <button class="nav-item" onclick="switchTab('upload')">
-          <i class="ti ti-upload"></i> Upload & Convert
-        </button>
-        <button class="nav-item" onclick="switchTab('info')">
-          <i class="ti ti-info-circle"></i> Info & Kontak
-        </button>
+        <button class="nav-item active" onclick="switchTab('search')"><i class="ti ti-search"></i> Cari Musik</button>
+        <button class="nav-item" onclick="switchTab('upload')"><i class="ti ti-upload"></i> Upload & Convert</button>
+        <button class="nav-item" onclick="switchTab('info')"><i class="ti ti-info-circle"></i> Info & Kontak</button>
       </nav>
     </div>
-
     <div class="sidebar-divider"></div>
-
     <div class="now-playing-side" id="npSide">
       <div class="nps-label">Now Playing</div>
       <div class="nps-card">
-        <div class="nps-art" id="npArt">
-          <i class="ti ti-music"></i>
-        </div>
+        <div class="nps-art" id="npArt"><i class="ti ti-music"></i></div>
         <div class="nps-meta">
           <div class="nps-title" id="npSideTitle">—</div>
           <div class="nps-artist" id="npSideArtist">—</div>
         </div>
       </div>
     </div>
-
     <div style="flex:1"></div>
-
     <div class="sidebar-bottom">
       <div class="sidebar-user">
         <div class="sidebar-avatar">G</div>
-        <div>
-          <div class="sidebar-uname">GAVINSKIE</div>
-          <div class="sidebar-urole">CREATOR</div>
-        </div>
+        <div><div class="sidebar-uname">GAVINSKIE</div><div class="sidebar-urole">CREATOR</div></div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
     <div class="topbar">
       <div class="search-wrap" id="searchWrap">
@@ -379,13 +307,9 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
           placeholder="Cari lagu, artis di SoundCloud..."
           onkeydown="if(event.key==='Enter')doSearch()"
           oninput="toggleClear()">
-        <button class="search-clear" id="searchClear" onclick="clearSearch()">
-          <i class="ti ti-x"></i>
-        </button>
+        <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="ti ti-x"></i></button>
       </div>
-      <div class="status-badge">
-        <span class="status-dot"></span> Online
-      </div>
+      <div class="status-badge"><span class="status-dot"></span> Online</div>
     </div>
 
     <!-- SEARCH PANEL -->
@@ -414,13 +338,11 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
           <span id="fromSearchLabel">Dari SoundCloud</span>
         </div>
       </div>
-
       <div class="dropzone" id="dropZone" onclick="document.getElementById('fileIn').click()">
         <div class="dropzone-icon"><i class="ti ti-file-music"></i></div>
         <h3 id="dropLabel">Seret atau klik untuk upload</h3>
         <p>Pilih file dari perangkat kamu</p>
         <small>MP3 · MP4 · WAV · OGG · M4A · FLAC · WEBM</small>
-        <!-- fetch overlay -->
         <div class="fetch-overlay" id="fetchOverlay">
           <i class="ti ti-cloud-download spin" style="font-size:28px;color:var(--accent2)"></i>
           <div class="fetch-title" id="fetchTitle">Mengambil audio...</div>
@@ -428,7 +350,6 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
         </div>
       </div>
       <input type="file" id="fileIn" accept="audio/*,video/mp4,video/webm" style="display:none">
-
       <div class="selected-file" id="selectedFile">
         <div class="sf-icon"><i class="ti ti-file-music"></i></div>
         <div class="sf-info">
@@ -437,24 +358,12 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
         </div>
         <button class="btn-clear-file" onclick="clearFile()"><i class="ti ti-x"></i></button>
       </div>
-
       <div class="wave-wrap"><canvas id="waveCanvas"></canvas></div>
-
       <div class="chips" id="infoChips">
-        <div class="chip">
-          <div class="chip-lbl">Durasi Asli</div>
-          <div class="chip-val" id="chipDur">—</div>
-        </div>
-        <div class="chip">
-          <div class="chip-lbl">Output A</div>
-          <div class="chip-val" id="chipOut">—</div>
-        </div>
-        <div class="chip">
-          <div class="chip-lbl">Playback ×</div>
-          <div class="chip-val" id="chipInv">—</div>
-        </div>
+        <div class="chip"><div class="chip-lbl">Durasi Asli</div><div class="chip-val" id="chipDur">—</div></div>
+        <div class="chip"><div class="chip-lbl">Output A</div><div class="chip-val" id="chipOut">—</div></div>
+        <div class="chip"><div class="chip-lbl">Playback ×</div><div class="chip-val" id="chipInv">—</div></div>
       </div>
-
       <div class="section-label">Controls</div>
       <div class="controls-grid">
         <div class="ctrl-card">
@@ -494,14 +403,9 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
           </div>
         </div>
       </div>
-
       <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
       <p class="status-txt" id="statusTxt">Upload file untuk mulai</p>
-
-      <button class="btn-main" id="processBtn" disabled>
-        <i class="ti ti-sparkles"></i> Proses Kedua Output
-      </button>
-
+      <button class="btn-main" id="processBtn" disabled><i class="ti ti-sparkles"></i> Proses Kedua Output</button>
       <div class="out-section" id="outSection">
         <div class="section-label">Hasil</div>
         <div class="out-grid">
@@ -527,59 +431,34 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
 
     <!-- INFO PANEL -->
     <div class="panel footer-panel" id="panel-info">
-      <div class="footer-hero">
-        <h1>Info & Kontak</h1>
-        <p>Jasa pembuatan aset Roblox Studio & kontak person</p>
-      </div>
+      <div class="footer-hero"><h1>Info & Kontak</h1><p>Jasa pembuatan aset Roblox Studio & kontak person</p></div>
       <div class="jasa-card">
         <div class="jasa-title"><i class="ti ti-briefcase"></i> Menyediakan Jasa</div>
         <div class="jasa-list">
-          <div class="jasa-item">Pembuatan Map</div>
-          <div class="jasa-item">Pembuatan Script</div>
-          <div class="jasa-item">Perbaikan Map</div>
-          <div class="jasa-item">Perbaikan Bug</div>
-          <div class="jasa-item">Pembuatan Server Discord</div>
-          <div class="jasa-item">Dan lain-lain</div>
+          <div class="jasa-item">Pembuatan Map</div><div class="jasa-item">Pembuatan Script</div>
+          <div class="jasa-item">Perbaikan Map</div><div class="jasa-item">Perbaikan Bug</div>
+          <div class="jasa-item">Pembuatan Server Discord</div><div class="jasa-item">Dan lain-lain</div>
         </div>
       </div>
       <div class="divider-line"></div>
       <div class="kontak-title"><i class="ti ti-address-book"></i> Kontak Person</div>
       <div class="kontak-grid">
-        <a class="kontak-card k-discord" href="https://discord.com/users/gav1nskie" target="_blank">
-          <div class="kontak-icon"><i class="ti ti-brand-discord"></i></div>
-          <div class="kontak-info"><div class="kontak-platform">Discord</div><div class="kontak-handle">@gav1nskie</div></div>
-        </a>
-        <a class="kontak-card k-tiktok" href="https://tiktok.com/@namelesserr0r" target="_blank">
-          <div class="kontak-icon"><i class="ti ti-brand-tiktok"></i></div>
-          <div class="kontak-info"><div class="kontak-platform">TikTok</div><div class="kontak-handle">@namelesserr0r</div></div>
-        </a>
-        <a class="kontak-card k-wa" href="https://wa.me/6281282664158" target="_blank">
-          <div class="kontak-icon"><i class="ti ti-brand-whatsapp"></i></div>
-          <div class="kontak-info"><div class="kontak-platform">WhatsApp</div><div class="kontak-handle">+62 812-8266-4158</div></div>
-        </a>
-        <a class="kontak-card k-yt" href="https://youtube.com/@namelesserr0r" target="_blank">
-          <div class="kontak-icon"><i class="ti ti-brand-youtube"></i></div>
-          <div class="kontak-info"><div class="kontak-platform">YouTube</div><div class="kontak-handle">@namelesserr0r</div></div>
-        </a>
+        <a class="kontak-card k-discord" href="https://discord.com/users/gav1nskie" target="_blank"><div class="kontak-icon"><i class="ti ti-brand-discord"></i></div><div class="kontak-info"><div class="kontak-platform">Discord</div><div class="kontak-handle">@gav1nskie</div></div></a>
+        <a class="kontak-card k-tiktok" href="https://tiktok.com/@namelesserr0r" target="_blank"><div class="kontak-icon"><i class="ti ti-brand-tiktok"></i></div><div class="kontak-info"><div class="kontak-platform">TikTok</div><div class="kontak-handle">@namelesserr0r</div></div></a>
+        <a class="kontak-card k-wa" href="https://wa.me/6281282664158" target="_blank"><div class="kontak-icon"><i class="ti ti-brand-whatsapp"></i></div><div class="kontak-info"><div class="kontak-platform">WhatsApp</div><div class="kontak-handle">+62 812-8266-4158</div></div></a>
+        <a class="kontak-card k-yt" href="https://youtube.com/@namelesserr0r" target="_blank"><div class="kontak-icon"><i class="ti ti-brand-youtube"></i></div><div class="kontak-info"><div class="kontak-platform">YouTube</div><div class="kontak-handle">@namelesserr0r</div></div></a>
       </div>
       <a class="server-card" href="https://discord.gg/7jSsJv7Haj" target="_blank">
         <div class="server-card-icon"><i class="ti ti-brand-discord"></i></div>
-        <div class="server-card-info">
-          <div class="server-card-label">Discord Server</div>
-          <div class="server-card-name">Ever Dream Studio</div>
-        </div>
+        <div class="server-card-info"><div class="server-card-label">Discord Server</div><div class="server-card-name">Ever Dream Studio</div></div>
         <i class="ti ti-arrow-right server-card-arrow"></i>
       </a>
     </div>
-
   </main>
 
-  <!-- PLAYER -->
   <div class="player">
     <div class="player-track">
-      <div class="player-thumb" id="playerThumb">
-        <i class="ti ti-music"></i>
-      </div>
+      <div class="player-thumb" id="playerThumb"><i class="ti ti-music"></i></div>
       <div class="player-info">
         <div class="player-title" id="playerTitle">Tidak ada yang diputar</div>
         <div class="player-artist" id="playerArtist">—</div>
@@ -594,24 +473,18 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
         <div class="player-eq-b" id="pe7" style="height:4px"></div>
       </div>
     </div>
-
     <div class="player-controls">
       <div class="player-btns">
         <button class="player-btn" onclick="playPrev()"><i class="ti ti-player-skip-back"></i></button>
-        <button class="player-btn play" id="btnPlay" onclick="togglePlay()">
-          <i class="ti ti-player-play" id="playIcon"></i>
-        </button>
+        <button class="player-btn play" id="btnPlay" onclick="togglePlay()"><i class="ti ti-player-play" id="playIcon"></i></button>
         <button class="player-btn" onclick="playNext()"><i class="ti ti-player-skip-forward"></i></button>
       </div>
       <div class="player-progress">
         <span class="player-time" id="timeCur">0:00</span>
-        <div class="player-bar" id="playerBarEl" onclick="seekTo(event)">
-          <div class="player-bar-fill" id="playerFill"></div>
-        </div>
+        <div class="player-bar" id="playerBarEl" onclick="seekTo(event)"><div class="player-bar-fill" id="playerFill"></div></div>
         <span class="player-time" id="timeDur">0:00</span>
       </div>
     </div>
-
     <div class="player-right">
       <div class="vol-wrap">
         <i class="ti ti-volume vol-icon"></i>
@@ -619,7 +492,6 @@ audio{width:100%;border-radius:6px;margin-bottom:6px;height:30px;accent-color:va
       </div>
     </div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -629,102 +501,85 @@ const API = 'https://web-production-3ff2c.up.railway.app';
 const $ = id => document.getElementById(id);
 
 let audioEl = new Audio();
+audioEl.crossOrigin = 'anonymous';
+let hlsInstance = null;
 let currentTrack = null;
 let trackList = [];
 let currentIdx = -1;
 let audioBuffer = null;
 let fmt = 'mp3';
+let isChangingSrc = false;
 
-// EQ animation
+// EQ bars animation
 const eqIds = ['pe1','pe2','pe3','pe4','pe5','pe6','pe7'];
-const eqTgt = {}, eqCur = {};
-eqIds.forEach(id => { eqTgt[id] = 2 + Math.random()*13; eqCur[id] = 2 + Math.random()*13; });
-setInterval(() => eqIds.forEach(id => { eqTgt[id] = 2 + Math.random()*13; }), 280);
-(function eqAnim() {
-  eqIds.forEach(id => {
-    const el = $(id); if(!el) return;
-    eqCur[id] += (eqTgt[id]-eqCur[id])*0.18;
-    el.style.height = Math.round(eqCur[id])+'px';
-  });
+const eqTgt={}, eqCur={};
+eqIds.forEach(id=>{eqTgt[id]=2+Math.random()*13;eqCur[id]=2+Math.random()*13;});
+setInterval(()=>eqIds.forEach(id=>{eqTgt[id]=2+Math.random()*13;}),280);
+(function eqAnim(){
+  eqIds.forEach(id=>{const el=$(id);if(!el)return;eqCur[id]+=(eqTgt[id]-eqCur[id])*0.18;el.style.height=Math.round(eqCur[id])+'px';});
   requestAnimationFrame(eqAnim);
 })();
 
 // ── TABS ──
 function switchTab(name) {
-  document.querySelectorAll('.nav-item').forEach((el,i) => {
-    el.classList.toggle('active', ['search','upload','info'][i]===name);
+  document.querySelectorAll('.nav-item').forEach((el,i)=>{
+    el.classList.toggle('active',['search','upload','info'][i]===name);
   });
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   $('panel-'+name).classList.add('active');
-  $('searchWrap').style.display = name==='search' ? 'block' : 'none';
+  $('searchWrap').style.display=name==='search'?'block':'none';
 }
-$('searchWrap').style.display = 'block';
+$('searchWrap').style.display='block';
 
 // ── TOAST ──
 let toastTimer;
-function toast(msg, dur=3000) {
-  const el = $('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), dur);
+function toast(msg,dur=3000){
+  const el=$('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),dur);
 }
 
 // ── SEARCH ──
-function toggleClear() {
-  $('searchClear').classList.toggle('visible', $('searchInput').value.length>0);
-}
-function clearSearch() {
-  $('searchInput').value = '';
-  $('searchClear').classList.remove('visible');
-  $('searchInput').focus();
-}
+function toggleClear(){$('searchClear').classList.toggle('visible',$('searchInput').value.length>0);}
+function clearSearch(){$('searchInput').value='';$('searchClear').classList.remove('visible');$('searchInput').focus();}
 
 async function doSearch() {
-  const q = $('searchInput').value.trim();
-  if(!q) return;
-  $('searchHeading').textContent = `"${q}"`;
-  $('searchSub').textContent = 'Mencari di SoundCloud...';
-  $('resultsArea').innerHTML = [1,2,3,4,5].map(()=>`
+  const q=$('searchInput').value.trim();if(!q)return;
+  $('searchHeading').textContent=`"${q}"`;
+  $('searchSub').textContent='Mencari di SoundCloud...';
+  $('resultsArea').innerHTML=[1,2,3,4,5].map(()=>`
     <div style="display:grid;grid-template-columns:32px 48px 1fr auto;align-items:center;gap:12px;padding:7px 10px;border-radius:10px;margin-bottom:2px">
       <div class="skel" style="height:12px;width:18px;margin:auto"></div>
       <div class="skel" style="width:42px;height:42px;border-radius:8px"></div>
       <div><div class="skel" style="height:12px;width:75%;margin-bottom:5px"></div><div class="skel" style="height:10px;width:45%"></div></div>
-      <div class="skel" style="height:10px;width:60px;border-radius:100px"></div>
-    </div>
-  `).join('');
+      <div class="skel" style="height:24px;width:70px;border-radius:100px"></div>
+    </div>`).join('');
   try {
-    const res = await fetch(`${API}/search?q=${encodeURIComponent(q)}&limit=20`);
-    if(!res.ok) throw new Error(`Error ${res.status}`);
-    const data = await res.json();
-    trackList = data.results || [];
-    if(!trackList.length) {
-      $('resultsArea').innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-search-off"></i></div><h3>Tidak Ada Hasil</h3><p>Coba kata kunci lain</p></div>`;
+    const res=await fetch(`${API}/search?q=${encodeURIComponent(q)}&limit=20`);
+    if(!res.ok)throw new Error(`Error ${res.status}`);
+    const data=await res.json();
+    trackList=data.results||[];
+    if(!trackList.length){
+      $('resultsArea').innerHTML=`<div class="empty-state"><div class="empty-icon"><i class="ti ti-search-off"></i></div><h3>Tidak Ada Hasil</h3><p>Coba kata kunci lain</p></div>`;
       return;
     }
-    $('searchHeading').textContent = `"${q}"`;
-    $('searchSub').textContent = `${trackList.length} hasil ditemukan dari SoundCloud`;
+    $('searchHeading').textContent=`"${q}"`;
+    $('searchSub').textContent=`${trackList.length} hasil ditemukan dari SoundCloud`;
     renderTrackList();
   } catch(e) {
-    $('resultsArea').innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><h3>Gagal Terhubung</h3><p>${e.message}</p></div>`;
+    $('resultsArea').innerHTML=`<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><h3>Gagal Terhubung</h3><p>${e.message}</p></div>`;
   }
 }
 
 function renderTrackList() {
-  const html = `
-    <div class="list-hd">
-      <span>${trackList.length} hasil</span>
-      <span style="color:var(--accent2)">SoundCloud</span>
-    </div>
-    ${trackList.map((r,i) => {
-      const isPlaying = i===currentIdx;
-      return `
-      <div class="track-row ${isPlaying?'playing':''} fade-up" id="tr-${i}" style="animation-delay:${i*0.03}s" onclick="playTrack(${i})">
+  $('resultsArea').innerHTML=`
+    <div class="list-hd"><span>${trackList.length} hasil</span><span style="color:var(--accent2)">SoundCloud</span></div>
+    ${trackList.map((r,i)=>{
+      const isP=i===currentIdx;
+      return `<div class="track-row ${isP?'playing':''} fade-up" id="tr-${i}" style="animation-delay:${i*0.03}s" onclick="playTrack(${i})">
         <div class="track-num">${i+1}</div>
-        <i class="track-play-icon ti ${isPlaying?'ti-player-pause':'ti-player-play'}"></i>
+        <i class="track-play-icon ti ${isP?'ti-player-pause':'ti-player-play'}"></i>
         <div class="track-thumb">
-          ${r.thumbnail ? `<img src="${escHtml(r.thumbnail)}" alt="" onerror="this.remove()">` : ''}
-          <i class="ti ti-music"></i>
+          ${r.thumbnail?`<img src="${escHtml(r.thumbnail)}" alt="" onerror="this.remove()">`:''}<i class="ti ti-music"></i>
         </div>
         <div class="track-info">
           <div class="track-title">${escHtml(r.title)}</div>
@@ -732,287 +587,252 @@ function renderTrackList() {
         </div>
         <div class="track-right">
           <span class="track-dur">${fmtDur(r.duration)}</span>
-          <button class="btn-process" id="proc-${i}" onclick="event.stopPropagation();processFromSearch(${i},this)" title="Process ke converter">
+          <button class="btn-process" id="proc-${i}" onclick="event.stopPropagation();processFromSearch(${i},this)">
             <i class="ti ti-sparkles"></i> Process
           </button>
         </div>
       </div>`;
-    }).join('')}
-  `;
-  $('resultsArea').innerHTML = html;
+    }).join('')}`;
 }
 
-// ── PROCESS FROM SEARCH (replaces download) ──
-async function processFromSearch(idx, btn) {
-  const r = trackList[idx];
-  if(!r) return;
+// ── HLS PLAYER HELPER ──
+function destroyHls() {
+  if(hlsInstance){hlsInstance.destroy();hlsInstance=null;}
+}
 
-  // Disable btn + loading state
-  btn.classList.add('loading');
-  btn.innerHTML = '<i class="ti ti-loader spin"></i> Mengambil...';
-  toast('⏳ Mengambil audio dari SoundCloud...', 10000);
-
-  // Switch to upload panel
-  switchTab('upload');
-
-  // Show fetch overlay on dropzone
-  const overlay = $('fetchOverlay');
-  overlay.classList.add('show');
-  $('fetchTitle').textContent = 'Mengambil: ' + (r.title.length>40 ? r.title.slice(0,38)+'…' : r.title);
-  $('fetchSub').textContent = 'Via proxy-audio endpoint...';
-
-  // Update upload hero
-  $('uploadHeroTitle').textContent = 'Convert Audio';
-  $('uploadHeroSub').textContent = r.title;
-  $('fromSearchLabel').textContent = `${escHtml(r.channel||'SoundCloud')} · ${fmtDur(r.duration)}`;
-  $('fromSearchBadge').style.display = 'inline-flex';
-
-  // Reset previous state
-  clearFile();
-
-  try {
-    $('fetchSub').textContent = 'Menghubungi proxy-audio...';
-    const resp = await fetch(`${API}/proxy-audio?url=${encodeURIComponent(r.url)}`);
-    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-    $('fetchSub').textContent = 'Membaca stream...';
-    const arrayBuf = await resp.arrayBuffer();
-    if(arrayBuf.byteLength < 1000) throw new Error('File terlalu kecil / gagal');
-
-    $('fetchSub').textContent = 'Decode audio...';
-    const actx = new (window.AudioContext || window.webkitAudioContext)();
-    audioBuffer = await actx.decodeAudioData(arrayBuf);
-
-    // Show file info
-    const sizeMB = (arrayBuf.byteLength/1048576).toFixed(2);
-    const name = r.title.replace(/[/\\?%*:|"<>]/g,'_')+'.mp3';
-    $('sfName').textContent = name.length>45 ? name.slice(0,42)+'…' : name;
-    $('sfMeta').textContent = fmtDur(audioBuffer.duration)+' · '+sizeMB+' MB · dari SoundCloud';
-    $('selectedFile').classList.add('show');
-    $('dropLabel').textContent = '✓ Audio siap';
-
-    updateChips();
-    drawWaveform(audioBuffer);
-    setStatus('Siap — '+audioBuffer.duration.toFixed(1)+'s');
-    $('processBtn').disabled = false;
-    $('outSection').style.display = 'none';
-
-    overlay.classList.remove('show');
-    toast('✅ Audio siap diproses!');
-
-    // Re-enable search btn (in case user goes back)
-    if(btn) { btn.classList.remove('loading'); btn.innerHTML = '<i class="ti ti-sparkles"></i> Process'; }
-
-  } catch(e) {
-    overlay.classList.remove('show');
-    toast('❌ Gagal ambil audio: '+e.message, 5000);
-    setStatus('❌ Gagal: '+e.message);
-    $('uploadHeroTitle').textContent = 'Upload & Convert';
-    $('uploadHeroSub').textContent = 'Upload file audio atau video, convert ke MP3 dengan efek profesional';
-    $('fromSearchBadge').style.display = 'none';
-    if(btn) { btn.classList.remove('loading'); btn.innerHTML = '<i class="ti ti-sparkles"></i> Process'; }
-    // Switch back to search
-    switchTab('search');
+function attachHls(streamUrl) {
+  destroyHls();
+  if(Hls.isSupported()){
+    hlsInstance=new Hls({enableWorker:false});
+    hlsInstance.loadSource(streamUrl);
+    hlsInstance.attachMedia(audioEl);
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED,()=>{
+      audioEl.play().catch(e=>{if(e.name!=='AbortError')toast('❌ Gagal play HLS: '+e.message,3000);});
+    });
+    hlsInstance.on(Hls.Events.ERROR,(ev,data)=>{
+      if(data.fatal) toast('❌ HLS error: '+data.type,3000);
+    });
+  } else if(audioEl.canPlayType('application/vnd.apple.mpegurl')) {
+    // Safari native HLS
+    audioEl.src=streamUrl;
+    audioEl.play().catch(e=>{if(e.name!=='AbortError')toast('❌ '+e.message,3000);});
+  } else {
+    toast('❌ Browser tidak support HLS',3000);
   }
 }
 
-// ── PLAYER ──
-// FIX: Pisahkan event error dari play() promise — ini fix untuk notif "gagal putar" palsu
-audioEl.addEventListener('timeupdate', updateProgress);
-audioEl.addEventListener('ended', playNext);
-audioEl.addEventListener('play', () => {
-  $('playIcon').className = 'ti ti-player-pause';
-  $('playerEq').style.display = 'flex';
-});
-audioEl.addEventListener('pause', () => {
-  $('playIcon').className = 'ti ti-player-play';
-  $('playerEq').style.display = 'none';
-});
-// Error handler terpisah — hanya fire kalau memang ada error nyata
-audioEl.addEventListener('error', (e) => {
-  // Ignore AbortError (terjadi saat src di-ganti sebelum play selesai — bukan error nyata)
-  if(audioEl.error && audioEl.error.code === MediaError.MEDIA_ERR_ABORTED) return;
-  if(audioEl.src && audioEl.src.length > 0) {
-    toast('❌ Gagal memutar audio', 3000);
-  }
-  $('playIcon').className = 'ti ti-player-play';
-  $('playerEq').style.display = 'none';
+// ── PLAY TRACK ──
+audioEl.addEventListener('timeupdate',updateProgress);
+audioEl.addEventListener('ended',playNext);
+audioEl.addEventListener('play',()=>{$('playIcon').className='ti ti-player-pause';$('playerEq').style.display='flex';});
+audioEl.addEventListener('pause',()=>{$('playIcon').className='ti ti-player-play';$('playerEq').style.display='none';});
+// Error: hanya tampilkan toast kalau bukan AbortError dan bukan saat kita sengaja ganti src
+audioEl.addEventListener('error',()=>{
+  if(isChangingSrc)return;
+  const err=audioEl.error;
+  if(!err||err.code===MediaError.MEDIA_ERR_ABORTED)return;
+  toast('❌ Gagal memutar audio (kode '+err.code+')',3000);
+  $('playIcon').className='ti ti-player-play';
+  $('playerEq').style.display='none';
 });
 
 async function playTrack(idx) {
-  currentIdx = idx;
-  const r = trackList[idx];
-  currentTrack = r;
+  currentIdx=idx;
+  const r=trackList[idx];
+  currentTrack=r;
 
-  $('playerTitle').textContent = r.title;
-  $('playerArtist').textContent = r.channel||'—';
-  $('npSideTitle').textContent = r.title;
-  $('npSideArtist').textContent = r.channel||'—';
-
-  // Update sidebar art
-  const npArt = $('npArt');
-  if(r.thumbnail) {
-    npArt.innerHTML = `<img src="${escHtml(r.thumbnail)}" alt="" onerror="this.remove();this.parentElement.innerHTML='<i class=ti ti-music></i>'">`;
-  } else {
-    npArt.innerHTML = `<i class="ti ti-music"></i>`;
-  }
-
-  // Update player thumb
-  const thumb = $('playerThumb');
-  if(r.thumbnail) {
-    thumb.innerHTML = `<img src="${escHtml(r.thumbnail)}" alt="" onerror="this.parentElement.innerHTML='<i class=ti ti-music></i>'">`;
-  } else {
-    thumb.innerHTML = `<i class="ti ti-music"></i>`;
-  }
-
+  $('playerTitle').textContent=r.title;
+  $('playerArtist').textContent=r.channel||'—';
+  $('npSideTitle').textContent=r.title;
+  $('npSideArtist').textContent=r.channel||'—';
+  const npArt=$('npArt');
+  npArt.innerHTML=r.thumbnail?`<img src="${escHtml(r.thumbnail)}" alt="" onerror="this.remove();this.parentElement.innerHTML='<i class=ti ti-music></i>'">`:
+    `<i class="ti ti-music"></i>`;
+  const thumb=$('playerThumb');
+  thumb.innerHTML=r.thumbnail?`<img src="${escHtml(r.thumbnail)}" alt="" onerror="this.parentElement.innerHTML='<i class=ti ti-music></i>'">`:
+    `<i class="ti ti-music"></i>`;
   $('npSide').classList.add('visible');
   renderTrackList();
 
-  // STOP dulu sebelum ganti src — mencegah false error
+  // Stop & reset dulu
+  isChangingSrc=true;
+  destroyHls();
   audioEl.pause();
   audioEl.removeAttribute('src');
-  audioEl.load(); // Reset state
+  audioEl.load();
+  isChangingSrc=false;
 
   try {
-    const res = await fetch(`${API}/stream-url?url=${encodeURIComponent(r.url)}`);
-    if(!res.ok) throw new Error('stream-url gagal');
-    const data = await res.json();
-    audioEl.src = data.stream_url;
-    // play() bisa throw AbortError kalau src diganti cepat — tangkap tapi jangan tampilkan toast
-    audioEl.play().catch(e => {
-      if(e.name !== 'AbortError' && e.name !== 'NotAllowedError') {
-        // Fallback ke proxy kalau stream URL gagal
+    const res=await fetch(`${API}/stream-url?url=${encodeURIComponent(r.url)}`);
+    if(!res.ok)throw new Error(`stream-url ${res.status}`);
+    const data=await res.json();
+
+    if(data.is_hls){
+      // HLS stream — pakai hls.js
+      attachHls(data.stream_url);
+    } else {
+      // HTTP biasa — langsung set src
+      audioEl.src=data.stream_url;
+      audioEl.play().catch(e=>{
+        if(e.name==='AbortError')return;
+        // Gagal direct, fallback ke proxy
+        toast('⚠️ Direct gagal, coba proxy...', 2000);
         tryProxyFallback(r.url);
-      }
-    });
+      });
+    }
   } catch(e) {
+    toast('⚠️ stream-url gagal, coba proxy...', 2000);
     tryProxyFallback(r.url);
   }
 }
 
 function tryProxyFallback(url) {
+  isChangingSrc=true;
+  destroyHls();
   audioEl.pause();
-  audioEl.src = `${API}/proxy-audio?url=${encodeURIComponent(url)}`;
-  audioEl.play().catch(e => {
-    if(e.name !== 'AbortError') toast('❌ Gagal memutar: '+e.message, 3000);
-  });
+  audioEl.removeAttribute('src');
+  audioEl.load();
+  isChangingSrc=false;
+  audioEl.src=`${API}/proxy-audio?url=${encodeURIComponent(url)}`;
+  audioEl.play().catch(e=>{if(e.name!=='AbortError')toast('❌ Semua metode gagal: '+e.message,4000);});
 }
 
-function togglePlay() {
-  if(!currentTrack && audioEl.src==='') return;
-  if(audioEl.paused) {
-    audioEl.play().catch(e => {
-      if(e.name !== 'AbortError') toast('❌ '+e.message);
-    });
-  } else {
-    audioEl.pause();
+function togglePlay(){
+  if(!currentTrack)return;
+  if(audioEl.paused)audioEl.play().catch(e=>{if(e.name!=='AbortError')toast('❌ '+e.message);});
+  else audioEl.pause();
+}
+function playNext(){if(currentIdx<trackList.length-1)playTrack(currentIdx+1);}
+function playPrev(){if(audioEl.currentTime>3){audioEl.currentTime=0;return;}if(currentIdx>0)playTrack(currentIdx-1);}
+function updateProgress(){
+  if(!audioEl.duration)return;
+  const pct=(audioEl.currentTime/audioEl.duration)*100;
+  $('playerFill').style.width=pct+'%';
+  $('timeCur').textContent=fmtDur(audioEl.currentTime);
+  $('timeDur').textContent=fmtDur(audioEl.duration);
+}
+function seekTo(e){
+  if(!audioEl.duration)return;
+  const bar=$('playerBarEl'),rect=bar.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+  audioEl.currentTime=pct*audioEl.duration;
+}
+function setVol(v){audioEl.volume=parseFloat(v);}
+
+// ── PROCESS FROM SEARCH ──
+async function processFromSearch(idx,btn) {
+  const r=trackList[idx];if(!r)return;
+  btn.classList.add('loading');
+  btn.innerHTML='<i class="ti ti-loader spin"></i> Mengambil...';
+  toast('⏳ Mengambil audio...', 15000);
+  switchTab('upload');
+  const overlay=$('fetchOverlay');
+  overlay.classList.add('show');
+  $('fetchTitle').textContent='Mengambil: '+(r.title.length>38?r.title.slice(0,36)+'…':r.title);
+  $('fetchSub').textContent='Menghubungi server...';
+  $('uploadHeroTitle').textContent='Convert Audio';
+  $('uploadHeroSub').textContent=r.title;
+  $('fromSearchLabel').textContent=`${escHtml(r.channel||'SoundCloud')} · ${fmtDur(r.duration)}`;
+  $('fromSearchBadge').style.display='inline-flex';
+  clearFile();
+
+  try {
+    $('fetchSub').textContent='Download via proxy-audio...';
+    const resp=await fetch(`${API}/proxy-audio?url=${encodeURIComponent(r.url)}`);
+    if(!resp.ok)throw new Error(`Server error HTTP ${resp.status}`);
+    $('fetchSub').textContent='Membaca data...';
+    const arrayBuf=await resp.arrayBuffer();
+    if(arrayBuf.byteLength<2000)throw new Error('Data terlalu kecil, coba lagi');
+    $('fetchSub').textContent='Decode audio...';
+    const actx=new(window.AudioContext||window.webkitAudioContext)();
+    audioBuffer=await actx.decodeAudioData(arrayBuf);
+    const sizeMB=(arrayBuf.byteLength/1048576).toFixed(2);
+    const name=(r.title.replace(/[/\\?%*:|"<>]/g,'_')+'.mp3');
+    $('sfName').textContent=name.length>45?name.slice(0,42)+'…':name;
+    $('sfMeta').textContent=fmtDur(audioBuffer.duration)+' · '+sizeMB+' MB · SoundCloud';
+    $('selectedFile').classList.add('show');
+    $('dropLabel').textContent='✓ Audio siap';
+    updateChips();drawWaveform(audioBuffer);
+    setStatus('Siap — '+audioBuffer.duration.toFixed(1)+'s');
+    $('processBtn').disabled=false;
+    $('outSection').style.display='none';
+    overlay.classList.remove('show');
+    toast('✅ Audio siap diproses!');
+    btn.classList.remove('loading');
+    btn.innerHTML='<i class="ti ti-sparkles"></i> Process';
+  } catch(e) {
+    overlay.classList.remove('show');
+    toast('❌ Gagal: '+e.message,5000);
+    setStatus('❌ Gagal: '+e.message);
+    $('uploadHeroTitle').textContent='Upload & Convert';
+    $('uploadHeroSub').textContent='Upload file audio atau video, convert ke MP3 dengan efek profesional';
+    $('fromSearchBadge').style.display='none';
+    btn.classList.remove('loading');
+    btn.innerHTML='<i class="ti ti-sparkles"></i> Process';
+    switchTab('search');
   }
 }
-
-function playNext() {
-  if(currentIdx < trackList.length-1) playTrack(currentIdx+1);
-}
-function playPrev() {
-  if(audioEl.currentTime>3){audioEl.currentTime=0;return;}
-  if(currentIdx>0) playTrack(currentIdx-1);
-}
-
-function updateProgress() {
-  if(!audioEl.duration) return;
-  const pct = (audioEl.currentTime/audioEl.duration)*100;
-  $('playerFill').style.width = pct+'%';
-  $('timeCur').textContent = fmtDur(audioEl.currentTime);
-  $('timeDur').textContent = fmtDur(audioEl.duration);
-}
-
-function seekTo(e) {
-  if(!audioEl.duration) return;
-  const bar = $('playerBarEl');
-  const rect = bar.getBoundingClientRect();
-  const pct = Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
-  audioEl.currentTime = pct * audioEl.duration;
-}
-function setVol(v) { audioEl.volume = parseFloat(v); }
 
 // ── FILE UPLOAD ──
-$('dropZone').addEventListener('dragover', e=>{e.preventDefault();$('dropZone').classList.add('drag');});
+$('dropZone').addEventListener('dragover',e=>{e.preventDefault();$('dropZone').classList.add('drag');});
 $('dropZone').addEventListener('dragleave',()=>$('dropZone').classList.remove('drag'));
-$('dropZone').addEventListener('drop',e=>{
-  e.preventDefault();$('dropZone').classList.remove('drag');
-  if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
-});
+$('dropZone').addEventListener('drop',e=>{e.preventDefault();$('dropZone').classList.remove('drag');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
 $('fileIn').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
 
-async function loadFile(file) {
+async function loadFile(file){
   setStatus('Memuat file...');
-  $('fromSearchBadge').style.display = 'none';
-  $('uploadHeroTitle').textContent = 'Upload & Convert';
-  $('uploadHeroSub').textContent = 'Upload file audio atau video, convert ke MP3 dengan efek profesional';
-  const actx = new (window.AudioContext || window.webkitAudioContext)();
-  try {
-    audioBuffer = await actx.decodeAudioData(await file.arrayBuffer());
-    $('sfName').textContent = file.name.length>45 ? file.name.slice(0,42)+'…' : file.name;
-    $('sfMeta').textContent = fmtDur(audioBuffer.duration)+' · '+fmtSize(file.size);
+  $('fromSearchBadge').style.display='none';
+  $('uploadHeroTitle').textContent='Upload & Convert';
+  $('uploadHeroSub').textContent='Upload file audio atau video, convert ke MP3 dengan efek profesional';
+  const actx=new(window.AudioContext||window.webkitAudioContext)();
+  try{
+    audioBuffer=await actx.decodeAudioData(await file.arrayBuffer());
+    $('sfName').textContent=file.name.length>45?file.name.slice(0,42)+'…':file.name;
+    $('sfMeta').textContent=fmtDur(audioBuffer.duration)+' · '+fmtSize(file.size);
     $('selectedFile').classList.add('show');
-    $('dropLabel').textContent = '✓ File dimuat';
-    updateChips();
-    drawWaveform(audioBuffer);
+    $('dropLabel').textContent='✓ File dimuat';
+    updateChips();drawWaveform(audioBuffer);
     setStatus('Siap — '+audioBuffer.duration.toFixed(1)+'s');
-    $('processBtn').disabled = false;
-    $('outSection').style.display = 'none';
-  } catch(e) {
-    setStatus('❌ Gagal membaca file');
-    toast('Gagal membaca file: '+e.message, 4000);
-  }
+    $('processBtn').disabled=false;$('outSection').style.display='none';
+  }catch(e){setStatus('❌ Gagal membaca file');toast('Gagal membaca file: '+e.message,4000);}
 }
 
-function clearFile() {
-  audioBuffer = null;
-  $('selectedFile').classList.remove('show');
-  $('processBtn').disabled = true;
-  $('outSection').style.display = 'none';
+function clearFile(){
+  audioBuffer=null;$('selectedFile').classList.remove('show');
+  $('processBtn').disabled=true;$('outSection').style.display='none';
   $('infoChips').classList.remove('show');
-  $('dropLabel').textContent = 'Seret atau klik untuk upload';
-  setStatus('Upload file untuk mulai');
-  $('fileIn').value = '';
-  // Clear waveform
-  const cv = $('waveCanvas'), ctx = cv.getContext('2d');
-  ctx.clearRect(0,0,cv.width,cv.height);
+  $('dropLabel').textContent='Seret atau klik untuk upload';
+  setStatus('Upload file untuk mulai');$('fileIn').value='';
+  const cv=$('waveCanvas'),ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
 }
 
-// ── SLIDERS ──
-function syncPair(rId,nId,dId,fn) {
+function syncPair(rId,nId,dId,fn){
   const r=$(rId),n=$(nId),d=$(dId);
   const upd=v=>{d.textContent=fn(parseFloat(v));updateChips();};
   r.addEventListener('input',()=>{n.value=r.value;upd(r.value);});
-  n.addEventListener('input',()=>{r.value=n.value;upd(n.value);});
-  upd(r.value);
+  n.addEventListener('input',()=>{r.value=n.value;upd(n.value);});upd(r.value);
 }
 syncPair('speedRange','speedNum','speedVal',v=>v.toFixed(2)+'×');
 syncPair('dbRange','dbNum','dbVal',v=>(v>=0?'+':'')+v.toFixed(1)+' dB');
 syncPair('durRange','durNum','durVal',v=>Math.round(v)+'s');
 
-function updateChips() {
-  if(!audioBuffer) return;
-  const speed = parseFloat($('speedNum').value);
-  const maxDur = parseFloat($('durNum').value);
-  const outSec = Math.min(audioBuffer.duration/speed,maxDur);
-  $('chipDur').textContent = audioBuffer.duration.toFixed(1)+'s';
-  $('chipOut').textContent = outSec.toFixed(1)+'s';
-  $('chipInv').textContent = (1/speed).toFixed(4)+'×';
+function updateChips(){
+  if(!audioBuffer)return;
+  const speed=parseFloat($('speedNum').value),maxDur=parseFloat($('durNum').value);
+  const outSec=Math.min(audioBuffer.duration/speed,maxDur);
+  $('chipDur').textContent=audioBuffer.duration.toFixed(1)+'s';
+  $('chipOut').textContent=outSec.toFixed(1)+'s';
+  $('chipInv').textContent=(1/speed).toFixed(4)+'×';
   $('infoChips').classList.add('show');
 }
 
-function setFmt(f) {
-  fmt=f;
-  $('fmtMp3').classList.toggle('active',f==='mp3');
-  $('fmtWav').classList.toggle('active',f==='wav');
+function setFmt(f){
+  fmt=f;$('fmtMp3').classList.toggle('active',f==='mp3');$('fmtWav').classList.toggle('active',f==='wav');
   $('mp3Opts').style.display=f==='mp3'?'block':'none';
 }
 setFmt('mp3');
 
-// ── WAVEFORM ──
-function drawWaveform(buf) {
+function drawWaveform(buf){
   const cv=$('waveCanvas'),ctx=cv.getContext('2d');
   cv.width=cv.offsetWidth*devicePixelRatio;cv.height=112;
   const data=buf.getChannelData(0),step=Math.ceil(data.length/cv.width),h=cv.height/2;
@@ -1027,54 +847,39 @@ function drawWaveform(buf) {
   }
 }
 
-// ── PROCESS ──
-$('processBtn').addEventListener('click', async()=>{
-  if(!audioBuffer) return;
-  $('processBtn').disabled=true;
-  $('outSection').style.display='none';
+$('processBtn').addEventListener('click',async()=>{
+  if(!audioBuffer)return;
+  $('processBtn').disabled=true;$('outSection').style.display='none';
   $('progWrap').style.display='block';
-  setP(5,'Menyiapkan...'); await tick(40);
-
-  const speed=parseFloat($('speedNum').value);
-  const db=parseFloat($('dbNum').value);
-  const maxDur=parseFloat($('durNum').value);
-  const gain=Math.pow(10,db/20);
-  const sr=audioBuffer.sampleRate,nc=audioBuffer.numberOfChannels;
-  const outSecA=Math.min(audioBuffer.duration/speed,maxDur);
-  const outLenA=Math.ceil(outSecA*sr);
-
-  setP(10,'Output A: time-stretching...'); await tick(40);
+  setP(5,'Menyiapkan...');await tick(40);
+  const speed=parseFloat($('speedNum').value),db=parseFloat($('dbNum').value),maxDur=parseFloat($('durNum').value);
+  const gain=Math.pow(10,db/20),sr=audioBuffer.sampleRate,nc=audioBuffer.numberOfChannels;
+  const outSecA=Math.min(audioBuffer.duration/speed,maxDur),outLenA=Math.ceil(outSecA*sr);
+  setP(10,'Output A: time-stretching...');await tick(40);
   let stretchedA;
-  try { stretchedA=await stStretch(audioBuffer,speed,outLenA,sr,nc); }
-  catch(e){ stretchedA=await fallbackStretch(audioBuffer,speed,outLenA,sr,nc); }
-
-  setP(40,'Output A: efek...'); await tick(40);
+  try{stretchedA=await stStretch(audioBuffer,speed,outLenA,sr,nc);}
+  catch(e){stretchedA=await fallbackStretch(audioBuffer,speed,outLenA,sr,nc);}
+  setP(40,'Output A: efek...');await tick(40);
   const renderedA=await applyFx(stretchedA,gain,sr,nc,outLenA);
-
   const outLenB=Math.min(audioBuffer.length,Math.ceil(maxDur*sr));
-  setP(60,'Output B: efek...'); await tick(40);
+  setP(60,'Output B: efek...');await tick(40);
   const renderedB=await applyFx(audioBuffer,gain,sr,nc,outLenB);
-
-  setP(85,'Encoding...'); await tick(40);
+  setP(85,'Encoding...');await tick(40);
   const kbps=parseInt($('bitrateSelect').value);
   const blobA=fmt==='mp3'?encodeMp3(renderedA,kbps):encodeWAV(renderedA);
   const blobB=fmt==='mp3'?encodeMp3(renderedB,kbps):encodeWAV(renderedB);
   const ext=fmt==='mp3'?'mp3':'wav';
   const urlA=URL.createObjectURL(blobA),urlB=URL.createObjectURL(blobB);
-
   $('previewA').src=urlA;$('dlA').href=urlA;$('dlA').download='output_A_speed.'+ext;
   $('previewB').src=urlB;$('dlB').href=urlB;$('dlB').download='output_B_original.'+ext;
   $('labelSpeedA').textContent=speed.toFixed(2)+'×';
   $('infoA').textContent=outSecA.toFixed(2)+'s · '+fmtSize(blobA.size);
   $('infoB').textContent=audioBuffer.duration.toFixed(2)+'s · '+fmtSize(blobB.size);
-
   setP(100,'✓ Selesai!');
-  $('outSection').style.display='block';
-  $('processBtn').disabled=false;
+  $('outSection').style.display='block';$('processBtn').disabled=false;
   toast('✅ Kedua output siap!');
 });
 
-// ── DSP ──
 function setP(p,m){$('progBar').style.width=p+'%';$('statusTxt').textContent=m;}
 function setStatus(m){$('statusTxt').textContent=m;}
 function tick(ms){return new Promise(r=>setTimeout(r,ms));}
@@ -1095,8 +900,7 @@ async function applyFx(srcBuf,gain,sr,nc,outLen){
   let peak=0;
   for(let c=0;c<rendered.numberOfChannels;c++){const d=rendered.getChannelData(c);for(let i=0;i<d.length;i++){const v=Math.abs(d[i]);if(v>peak)peak=v;}}
   if(peak>0.001&&peak<0.97){
-    const ng=0.95/peak;
-    const nCtx=new OfflineAudioContext(rendered.numberOfChannels,outLen,sr);
+    const ng=0.95/peak,nCtx=new OfflineAudioContext(rendered.numberOfChannels,outLen,sr);
     const s2=nCtx.createBufferSource();s2.buffer=rendered;
     const g2=nCtx.createGain();g2.gain.value=ng;
     s2.connect(g2);g2.connect(nCtx.destination);s2.start(0);
@@ -1104,7 +908,6 @@ async function applyFx(srcBuf,gain,sr,nc,outLen){
   }
   return rendered;
 }
-
 async function stStretch(srcBuf,speed,outLen,sr,nc){
   const L=srcBuf.getChannelData(0),R=nc>1?srcBuf.getChannelData(1):L;
   const st=new soundtouch.SoundTouch(sr);st.tempo=speed;st.pitch=1.0;
@@ -1115,20 +918,15 @@ async function stStretch(srcBuf,speed,outLen,sr,nc){
   const ob=new AudioBuffer({numberOfChannels:nc,length:outLen,sampleRate:sr});
   const oL=new Float32Array(outLen),oR=new Float32Array(outLen);
   for(let i=0;i<outLen;i++){oL[i]=out[i*2];oR[i]=out[i*2+1];}
-  ob.copyToChannel(oL,0);if(nc>1)ob.copyToChannel(oR,1);
-  return ob;
+  ob.copyToChannel(oL,0);if(nc>1)ob.copyToChannel(oR,1);return ob;
 }
-
 async function fallbackStretch(srcBuf,speed,outLen,sr,nc){
   const offCtx=new OfflineAudioContext(nc,outLen,sr);
   const src=offCtx.createBufferSource();src.buffer=srcBuf;src.playbackRate.value=speed;
-  src.connect(offCtx.destination);src.start(0);
-  return await offCtx.startRendering();
+  src.connect(offCtx.destination);src.start(0);return await offCtx.startRendering();
 }
-
 function encodeMp3(buf,kbps){
-  const nc=buf.numberOfChannels,sr=buf.sampleRate;
-  const enc=new lamejs.Mp3Encoder(nc,sr,kbps);
+  const nc=buf.numberOfChannels,sr=buf.sampleRate,enc=new lamejs.Mp3Encoder(nc,sr,kbps);
   const bs=1152,L=buf.getChannelData(0),R=nc>1?buf.getChannelData(1):null,chunks=[];
   for(let i=0;i<L.length;i+=bs){const lc=f2i(L.subarray(i,i+bs));const e=R?enc.encodeBuffer(lc,f2i(R.subarray(i,i+bs))):enc.encodeBuffer(lc);if(e.length>0)chunks.push(new Int8Array(e));}
   const end=enc.flush();if(end.length>0)chunks.push(new Int8Array(end));
@@ -1147,8 +945,6 @@ function encodeWAV(buf){
   for(let i=0;i<ns;i++)for(let c=0;c<nc;c++){const s=Math.max(-1,Math.min(1,ch[c][i]));v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);off+=2;}
   return new Blob([ab],{type:'audio/wav'});
 }
-
-// ── UTILS ──
 function fmtCount(n){if(!n)return '0';if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)return (n/1000).toFixed(1)+'K';return n.toString();}
 function escHtml(s){if(!s)return '';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDur(sec){if(!sec)return '0:00';sec=Math.floor(sec);const m=Math.floor(sec/60),s=sec%60;return m+':'+String(s).padStart(2,'0');}
