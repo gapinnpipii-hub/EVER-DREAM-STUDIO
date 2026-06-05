@@ -230,3 +230,31 @@ async def get_audio(url: str = Query(...)):
         if path and os.path.exists(path):
             os.remove(path)
         raise HTTPException(status_code=500, detail=f"Gagal: {str(e)}")
+
+
+# ── DEBUG (hapus setelah selesai debug) ──
+@app.get("/debug-formats")
+async def debug_formats(url: str = Query(...)):
+    try:
+        opts = base_ydl_opts()
+        opts['skip_download'] = True
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            formats = info.get('formats') or []
+            return JSONResponse({
+                "total_formats": len(formats),
+                "formats": [
+                    {
+                        "format_id": f.get("format_id"),
+                        "ext": f.get("ext"),
+                        "acodec": f.get("acodec"),
+                        "vcodec": f.get("vcodec"),
+                        "abr": f.get("abr"),
+                        "tbr": f.get("tbr"),
+                        "has_url": bool(f.get("url")),
+                    }
+                    for f in formats
+                ]
+            })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
