@@ -901,6 +901,152 @@ audio {
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+
+/* ── SOUNDCLOUD CARD STYLE ── */
+.sc-track-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.sc-card {
+  background: #1a1a26;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: default;
+}
+.sc-card:hover {
+  border-color: rgba(255,255,255,0.15);
+  background: #1e1e2e;
+}
+.sc-card.playing {
+  border-color: rgba(108,99,255,0.4);
+  background: rgba(108,99,255,0.07);
+}
+
+.sc-card-top {
+  display: flex; gap: 14px; align-items: flex-start;
+}
+
+.sc-avatar {
+  width: 90px; height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  background: #2a2a3a;
+}
+.sc-avatar img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+.sc-avatar-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: var(--text3);
+  background: linear-gradient(135deg, #1e1e2e, #2a2a3a);
+}
+.sc-play-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+  font-size: 26px; color: #fff;
+}
+.sc-avatar:hover .sc-play-overlay,
+.sc-card.playing .sc-play-overlay { opacity: 1; }
+
+.sc-card-body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.sc-card-meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px;
+}
+.sc-artist {
+  color: var(--accent2);
+  font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 180px;
+}
+.sc-dot { color: var(--text3); font-size: 10px; }
+.sc-dur {
+  color: var(--text3);
+  font-family: var(--mono); font-size: 11px;
+  flex-shrink: 0;
+}
+
+.sc-title {
+  font-size: 15px; font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.15s;
+}
+.sc-title:hover { color: var(--accent2); }
+.sc-card.playing .sc-title { color: var(--accent2); }
+
+/* WAVEFORM */
+.sc-waveform {
+  display: flex; align-items: flex-end; gap: 2px;
+  height: 40px; cursor: pointer;
+  padding: 4px 0;
+}
+.sc-bar {
+  flex: 1;
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+  transition: background 0.15s;
+}
+.sc-bar.played { background: var(--accent); }
+.sc-waveform:hover .sc-bar { background: rgba(255,255,255,0.3); }
+.sc-waveform:hover .sc-bar.played { background: var(--accent2); }
+.sc-card.playing .sc-bar { background: rgba(139,133,255,0.3); }
+.sc-card.playing .sc-bar.played { background: var(--accent2); }
+
+/* ACTIONS */
+.sc-actions {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+.sc-actions-left { display: flex; align-items: center; gap: 12px; }
+.sc-stat {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--text3);
+  font-family: var(--mono);
+}
+.sc-stat i { font-size: 12px; }
+
+.sc-btn-dl {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: rgba(108,99,255,0.12);
+  border: 1px solid rgba(108,99,255,0.25);
+  color: var(--accent2);
+  font-size: 11px; font-weight: 700;
+  font-family: var(--sans);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sc-btn-dl:hover {
+  background: rgba(108,99,255,0.25);
+  border-color: rgba(108,99,255,0.5);
+  color: #fff;
+}
+.sc-btn-dl i { font-size: 12px; }
+
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
 @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 .fade-up { animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) both; }
@@ -1290,28 +1436,59 @@ async function doSearch() {
   }
 }
 
+function generateWaveBars(seed, count = 40) {
+  let s = seed || 12345;
+  const bars = [];
+  for (let i = 0; i < count; i++) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const h = 15 + (Math.abs(s) % 70);
+    bars.push(h);
+  }
+  return bars;
+}
+
 function renderTrackList() {
   $('resultsArea').innerHTML = `
-    <div class="track-list">
-      ${trackList.map((r, i) => `
-        <div class="track-row ${i === currentIdx ? 'playing' : ''}" id="tr-${i}" onclick="playTrack(${i})" style="animation:fadeUp 0.3s ${i*0.03}s both">
-          <div style="position:relative;display:flex;align-items:center;justify-content:center">
-            <span class="track-num">${i+1}</span>
-            <i class="ti ti-player-play track-play-icon"></i>
-          </div>
-          <img class="track-thumb" src="${r.thumbnail}" alt="" onerror="this.style.display='none'">
-          <div class="track-info">
-            <div class="track-title">${escHtml(r.title)}</div>
-            <div class="track-artist">${escHtml(r.channel || '—')}</div>
-          </div>
-          <span class="track-dur">${fmtDur(r.duration)}</span>
-          <div class="track-actions">
-            <a class="btn-icon" href="${API}/audio?url=${encodeURIComponent(r.url)}" download title="Download MP3" onclick="event.stopPropagation()">
-              <i class="ti ti-download"></i>
-            </a>
+    <div class="sc-track-list">
+      ${trackList.map((r, i) => {
+        const bars = generateWaveBars(r.id ? parseInt(r.id.toString().replace(/\D/g,'').slice(0,8)) : i * 777, 60);
+        const isPlaying = i === currentIdx;
+        return `
+        <div class="sc-card ${isPlaying ? 'playing' : ''}" id="tr-${i}" style="animation:fadeUp 0.3s ${i*0.04}s both">
+          <div class="sc-card-top">
+            <div class="sc-avatar" onclick="playTrack(${i})">
+              ${r.thumbnail
+                ? `<img src="${r.thumbnail}" alt="" onerror="this.parentElement.innerHTML='<div class=sc-avatar-fallback><i class=ti ti-music></i></div>'">`
+                : `<div class="sc-avatar-fallback"><i class="ti ti-music"></i></div>`
+              }
+              <div class="sc-play-overlay">
+                <i class="ti ${isPlaying ? 'ti-player-pause' : 'ti-player-play'}"></i>
+              </div>
+            </div>
+            <div class="sc-card-body">
+              <div class="sc-card-meta">
+                <span class="sc-artist">${escHtml(r.channel || '—')}</span>
+                <span class="sc-dot">·</span>
+                <span class="sc-dur">${fmtDur(r.duration)}</span>
+              </div>
+              <div class="sc-title" onclick="playTrack(${i})">${escHtml(r.title)}</div>
+              <div class="sc-waveform" onclick="playTrack(${i})">
+                ${bars.map((h, bi) => `<div class="sc-bar ${isPlaying && bi < bars.length * 0.3 ? 'played' : ''}" style="height:${h}%"></div>`).join('')}
+              </div>
+              <div class="sc-actions">
+                <div class="sc-actions-left">
+                  ${r.view_count ? `<span class="sc-stat"><i class="ti ti-player-play"></i> ${fmtCount(r.view_count)}</span>` : ''}
+                </div>
+                <div class="sc-actions-right">
+                  <a class="sc-btn-dl" href="${API}/audio?url=${encodeURIComponent(r.url)}" download title="Download MP3" onclick="event.stopPropagation()">
+                    <i class="ti ti-download"></i> Download
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      `).join('')}
+      `}).join('')}
     </div>
   `;
 }
@@ -1619,6 +1796,7 @@ function encodeWAV(buf){
 }
 
 // ── UTILS ──
+function fmtCount(n){if(!n)return '0';if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)return (n/1000).toFixed(1)+'K';return n.toString();}
 function escHtml(s){if(!s)return '';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDur(sec){if(!sec)return '0:00';sec=Math.floor(sec);const m=Math.floor(sec/60),s=sec%60;return m+':'+String(s).padStart(2,'0');}
 function fmtSize(b){return b>1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';}
