@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
-import yt_dlp, os, re
+import yt_dlp, os, re, httpx
 
 app = FastAPI()
 
@@ -16,26 +16,37 @@ def extract_video_id(url: str):
     m = re.search(r'(?:v=|youtu\.be/|shorts/)([a-zA-Z0-9_-]{11})', url)
     return m.group(1) if m else None
 
-def fmt_duration(sec):
-    if not sec: return '—'
-    sec = int(sec)
-    m, s = divmod(sec, 60)
-    h, m = divmod(m, 60)
-    return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+# YDL options anti-bot
+def get_ydl_opts(extra={}):
+    opts = {
+        'quiet': True,
+        'no_warnings': True,
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'web'],
+            }
+        },
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+    }
+    opts.update(extra)
+    return opts
 
 # ── SEARCH ──
 @app.get("/search")
 async def search(q: str = Query(...), limit: int = 10):
     try:
-        ydl_opts = {
-            'quiet': True,
+        opts = get_ydl_opts({
             'skip_download': True,
             'extract_flat': True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        })
+        with yt_dlp.YoutubeDL(opts) as ydl:
             results = ydl.extract_info(f"ytsearch{limit}:{q}", download=False)
             items = []
-            for entry in results.get("entries", []):
+            for entry in (results.get("entries") or []):
                 if not entry:
                     continue
                 vid_id = entry.get("id")
@@ -52,29 +63,25 @@ async def search(q: str = Query(...), limit: int = 10):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Pencarian gagal: {str(e)}")
 
-# ── STREAM URL (untuk decode audio di browser) ──
+# ── STREAM URL ──
 @app.get("/stream-url")
 async def get_stream_url(url: str = Query(...)):
     if not extract_video_id(url):
         raise HTTPException(status_code=400, detail="URL YouTube tidak valid")
     try:
-        ydl_opts = {
+        opts = get_ydl_opts({
             'format': 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best',
-            'quiet': True,
             'skip_download': True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        })
+        with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=False)
-
-            # Cari format audio terbaik
-            formats = info.get('formats', [])
+            formats = info.get('formats') or []
             audio_fmt = next(
                 (f for f in reversed(formats)
                  if f.get('acodec') != 'none' and f.get('vcodec') == 'none' and f.get('url')),
                 None
             )
             stream_url = (audio_fmt or {}).get('url') or info.get('url')
-
             if not stream_url:
                 raise HTTPException(status_code=500, detail="Tidak dapat menemukan stream URL")
 
@@ -90,26 +97,65 @@ async def get_stream_url(url: str = Query(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil stream URL: {str(e)}")
 
-# ── AUDIO DOWNLOAD (download langsung MP3) ──
+# ── AUDIO PROXY (backend yang fetch stream, bukan browser) ──
+# Ini menghindari CORS block saat browser coba fetch YouTube CDN langsung
+@app.get("/proxy-audio")
+async def proxy_audio(url: str = Query(...)):
+    if not extract_video_id(url):
+        raise HTTPException(status_code=400, detail="URL tidak valid")
+    try:
+        opts = get_ydl_opts({
+            'format': 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best',
+            'skip_download': True,
+        })
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            formats = info.get('formats') or []
+            audio_fmt = next(
+                (f for f in reversed(formats)
+                 if f.get('acodec') != 'none' and f.get('vcodec') == 'none' and f.get('url')),
+                None
+            )
+            stream_url = (audio_fmt or {}).get('url') or info.get('url')
+            if not stream_url:
+                raise HTTPException(status_code=500, detail="Stream URL tidak ditemukan")
+
+        # Backend proxy stream ke client
+        async def stream_audio():
+            async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+                async with client.stream("GET", stream_url, headers={
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+                    "Referer": "https://www.youtube.com/",
+                    "Origin": "https://www.youtube.com",
+                }) as r:
+                    async for chunk in r.aiter_bytes(chunk_size=65536):
+                        yield chunk
+
+        return StreamingResponse(stream_audio(), media_type="audio/webm")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Proxy gagal: {str(e)}")
+
+# ── AUDIO DOWNLOAD (MP3 via ffmpeg) ──
 @app.get("/audio")
 async def get_audio(url: str = Query(...)):
     if not extract_video_id(url):
         raise HTTPException(status_code=400, detail="URL YouTube tidak valid")
-
     path = None
     try:
-        ydl_opts = {
+        opts = get_ydl_opts({
             'format': 'bestaudio/best',
             'outtmpl': '/tmp/%(id)s.%(ext)s',
             'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
-            'quiet': True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        })
+        with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=True)
             path = f"/tmp/{info['id']}.mp3"
 
         if not os.path.exists(path):
-            raise HTTPException(status_code=500, detail="File audio tidak ditemukan setelah download")
+            raise HTTPException(status_code=500, detail="File tidak ditemukan setelah download")
 
         def iterfile():
             try:
@@ -130,4 +176,4 @@ async def get_audio(url: str = Query(...)):
     except Exception as e:
         if path and os.path.exists(path):
             os.remove(path)
-        raise HTTPException(status_code=500, detail=f"Gagal mengambil audio: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Gagal: {str(e)}")
