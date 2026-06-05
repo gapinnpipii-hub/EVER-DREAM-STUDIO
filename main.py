@@ -148,6 +148,7 @@ async def get_audio(url: str = Query(...)):
         opts['format'] = 'bestaudio/best'
         opts['outtmpl'] = '/tmp/%(id)s.%(ext)s'
         opts['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]
+        opts['ffmpeg_location'] = '/usr/bin'
 
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=True)
