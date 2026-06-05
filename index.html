@@ -5,34 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ever Dream Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Figtree:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.30/dist/soundtouch.min.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
 :root {
-  --bg:       #080a0f;
-  --surface:  #0d1017;
-  --card:     #111520;
-  --card2:    #161c28;
-  --border:   #1e2736;
-  --border2:  #2a3548;
-  --accent:   #3b82f6;
-  --accent2:  #60a5fa;
-  --gold:     #f59e0b;
-  --green:    #10b981;
-  --red:      #ef4444;
-  --text:     #e8edf5;
-  --text2:    #8899b4;
-  --text3:    #4a5a72;
-  --mono:     'DM Mono', monospace;
-  --sans:     'Syne', sans-serif;
-  --r:        12px;
-  --r2:       8px;
+  --bg:        #0a0a0a;
+  --bg2:       #111111;
+  --surface:   #161616;
+  --card:      #1a1a1a;
+  --card2:     #202020;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --g1:        #1db954;
+  --g2:        #1ed760;
+  --blue:      #4f8ef7;
+  --purple:    #b14ff7;
+  --orange:    #ff6b35;
+  --text:      #ffffff;
+  --text2:     rgba(255,255,255,0.6);
+  --text3:     rgba(255,255,255,0.25);
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Figtree', sans-serif;
+  --r:         16px;
+  --r2:        10px;
+  --shadow:    0 8px 40px rgba(0,0,0,0.6);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -41,38 +44,38 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── NOISE OVERLAY ── */
-body::before {
-  content: '';
+/* ── AMBIENT BG ── */
+.ambient {
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
+  overflow: hidden;
 }
-
-/* ── GLOW BG ── */
-.bg-glow {
-  position: fixed;
-  width: 600px; height: 600px;
+.ambient-blob {
+  position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  z-index: 0;
+  filter: blur(100px);
+  opacity: 0.12;
 }
-.glow-1 { background: rgba(59,130,246,.07); top: -200px; left: -200px; }
-.glow-2 { background: rgba(245,158,11,.05); bottom: -200px; right: -200px; }
+.blob-1 { width: 700px; height: 700px; background: var(--g1); top: -300px; left: -200px; animation: float1 20s ease-in-out infinite; }
+.blob-2 { width: 500px; height: 500px; background: var(--blue); bottom: -200px; right: -100px; animation: float2 25s ease-in-out infinite; }
+.blob-3 { width: 400px; height: 400px; background: var(--purple); top: 40%; left: 40%; animation: float3 18s ease-in-out infinite; }
+
+@keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+@keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-40px,-60px)} }
+@keyframes float3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-30px)} }
 
 /* ── LAYOUT ── */
 .wrap {
   position: relative;
   z-index: 1;
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 0 20px 60px;
+  padding: 0 24px 80px;
 }
 
 /* ── HEADER ── */
@@ -80,63 +83,74 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 0 40px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 40px;
-  animation: fadeDown .5s ease both;
+  padding: 36px 0 48px;
+  animation: slideDown 0.6s cubic-bezier(0.16,1,0.3,1) both;
 }
+
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
-.logo-icon {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, var(--accent), #1d4ed8);
-  border-radius: 10px;
+
+.logo-mark {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--g1), var(--blue));
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: #fff;
-  box-shadow: 0 0 20px rgba(59,130,246,.3);
+  font-size: 24px;
+  box-shadow: 0 0 30px rgba(29,185,84,0.35), 0 0 60px rgba(79,142,247,0.2);
+  position: relative;
+  overflow: hidden;
 }
-.logo-text {
-  display: flex;
-  flex-direction: column;
+.logo-mark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
 }
-.logo-name {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  color: var(--text);
+.logo-mark i { position: relative; z-index: 1; color: #fff; }
+
+.logo-text .name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 60%, rgba(255,255,255,0.5));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-.logo-sub {
-  font-size: 10px;
+.logo-text .sub {
+  font-size: 11px;
   font-family: var(--mono);
   color: var(--text3);
-  letter-spacing: .12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  margin-top: 1px;
 }
-.badge-live {
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(16,185,129,.1);
-  border: 1px solid rgba(16,185,129,.25);
-  color: var(--green);
-  letter-spacing: .1em;
+
+.status-pill {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(29,185,84,0.1);
+  border: 1px solid rgba(29,185,84,0.2);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--g2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-.badge-live::before {
-  content: '';
-  width: 6px; height: 6px;
+.dot {
+  width: 7px; height: 7px;
   border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s infinite;
+  background: var(--g2);
+  box-shadow: 0 0 8px var(--g2);
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* ── TABS ── */
@@ -145,145 +159,150 @@ header {
   gap: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 4px;
-  margin-bottom: 32px;
-  animation: fadeUp .5s .1s ease both;
+  border-radius: 100px;
+  padding: 5px;
+  margin-bottom: 36px;
+  animation: slideUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both;
 }
+
 .tab {
   flex: 1;
-  padding: 10px 16px;
+  padding: 12px 20px;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: .03em;
   border: none;
-  border-radius: 9px;
+  border-radius: 100px;
   cursor: pointer;
   background: transparent;
   color: var(--text2);
-  transition: all .2s;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
+  white-space: nowrap;
 }
 .tab.active {
-  background: var(--card2);
-  color: var(--text);
-  border: 1px solid var(--border2);
-  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  background: #fff;
+  color: #000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
-.tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.03); }
+.tab:hover:not(.active) { color: #fff; background: var(--card2); }
 
-/* ── PANEL ── */
-.panel { display: none; animation: fadeUp .3s ease both; }
-.panel.active { display: block; }
+/* ── PANELS ── */
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
 
-/* ── SEARCH BOX ── */
+/* ── SEARCH ── */
 .search-wrap {
   position: relative;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 .search-input {
   width: 100%;
-  padding: 16px 60px 16px 52px;
+  padding: 20px 130px 20px 60px;
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
   color: var(--text);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
   outline: none;
-  transition: border-color .2s, box-shadow .2s;
+  transition: all 0.25s;
+  box-shadow: var(--shadow);
 }
 .search-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+  border-color: var(--g1);
+  box-shadow: 0 0 0 4px rgba(29,185,84,0.1), var(--shadow);
 }
 .search-input::placeholder { color: var(--text3); }
 .search-icon {
   position: absolute;
-  left: 18px; top: 50%;
+  left: 22px; top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
-  font-size: 18px;
+  font-size: 20px;
   pointer-events: none;
 }
 .search-btn {
   position: absolute;
-  right: 8px; top: 50%;
+  right: 6px; top: 50%;
   transform: translateY(-50%);
-  padding: 8px 16px;
-  background: var(--accent);
+  padding: 11px 24px;
+  background: linear-gradient(135deg, var(--g1), var(--blue));
   border: none;
-  border-radius: 8px;
+  border-radius: 100px;
   color: #fff;
   font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background .2s, transform .1s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(29,185,84,0.3);
 }
-.search-btn:hover { background: var(--accent2); }
-.search-btn:active { transform: translateY(-50%) scale(.97); }
+.search-btn:hover { transform: translateY(-50%) scale(1.03); box-shadow: 0 6px 28px rgba(29,185,84,0.45); }
+.search-btn:active { transform: translateY(-50%) scale(0.98); }
 
-/* ── RESULTS ── */
+/* ── RESULT CARDS ── */
 .results-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  padding: 0 4px;
 }
 .results-label {
-  font-size: 11px;
+  font-size: 12px;
   font-family: var(--mono);
   color: var(--text3);
-  letter-spacing: .1em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .results-count {
-  font-size: 11px;
+  font-size: 12px;
   font-family: var(--mono);
-  color: var(--accent);
+  color: var(--g1);
+  font-weight: 500;
 }
 
-.result-list { display: flex; flex-direction: column; gap: 10px; }
+.result-list { display: flex; flex-direction: column; gap: 8px; }
 
 .result-card {
   display: flex;
-  gap: 14px;
-  padding: 14px;
+  gap: 16px;
+  padding: 16px;
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--r);
   cursor: pointer;
-  transition: border-color .2s, background .2s, transform .15s;
-  animation: fadeUp .3s ease both;
+  transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
 }
 .result-card:hover {
   border-color: var(--border2);
   background: var(--card2);
-  transform: translateY(-1px);
+  transform: translateX(4px);
 }
 .result-card.selected {
-  border-color: var(--accent);
-  background: rgba(59,130,246,.06);
+  border-color: var(--g1);
+  background: rgba(29,185,84,0.05);
 }
+
 .result-thumb {
-  width: 120px;
-  height: 68px;
+  width: 112px; height: 64px;
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
   background: var(--card2);
 }
-.result-info { flex: 1; min-width: 0; }
+
+.result-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .result-title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -292,92 +311,253 @@ header {
 }
 .result-meta {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text3);
   flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 .result-meta span { display: flex; align-items: center; gap: 4px; }
-.result-action {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-.btn-use {
-  padding: 5px 14px;
-  background: var(--accent);
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s;
-}
-.btn-use:hover { background: var(--accent2); }
-.btn-dl-direct {
-  padding: 5px 14px;
-  background: rgba(16,185,129,.1);
-  border: 1px solid rgba(16,185,129,.25);
-  border-radius: 6px;
-  color: var(--green);
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.btn-dl-direct:hover { background: rgba(16,185,129,.18); }
 
-/* ── CARD BASE ── */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
+.result-actions { display: flex; align-items: center; gap: 8px; }
+
+.btn-process-sm {
+  padding: 6px 16px;
+  background: var(--g1);
+  border: none;
+  border-radius: 100px;
+  color: #000;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn-process-sm:hover { background: var(--g2); transform: scale(1.04); }
+
+.btn-dl-sm {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1.5px solid var(--border2);
+  border-radius: 100px;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-dl-sm:hover { border-color: var(--text2); color: #fff; }
+
+/* ── SELECTED TRACK ── */
+.selected-track {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(29,185,84,0.1), rgba(79,142,247,0.05));
+  border: 1.5px solid rgba(29,185,84,0.25);
   border-radius: var(--r);
-  padding: 18px 20px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1);
 }
-.card-label {
-  font-size: 10px;
+.selected-track img {
+  width: 52px; height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.sel-info { flex: 1; min-width: 0; }
+.sel-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sel-meta {
+  font-size: 11px; font-family: var(--mono);
+  color: var(--text3); margin-top: 3px;
+}
+.btn-clear {
+  background: none; border: none;
+  color: var(--text3); cursor: pointer;
+  font-size: 18px; padding: 6px;
+  transition: color 0.2s; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-clear:hover { color: #ff4444; background: rgba(255,68,68,0.1); }
+
+/* ── URL PANEL ── */
+.url-panel-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 28px;
+}
+.url-panel-card h3 {
+  font-size: 18px; font-weight: 800; margin-bottom: 6px;
+}
+.url-panel-card p {
+  font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5;
+}
+.url-input-row {
+  display: flex; gap: 10px;
+}
+.url-input {
+  flex: 1;
+  padding: 14px 18px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r2);
+  color: var(--text);
   font-family: var(--mono);
-  color: var(--text3);
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
 }
+.url-input:focus { border-color: var(--g1); }
+.url-input::placeholder { color: var(--text3); }
+.btn-load {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--g1), var(--blue));
+  border: none; border-radius: var(--r2);
+  color: #fff; font-family: var(--sans);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-load:hover { opacity: 0.9; transform: translateY(-1px); }
 
 /* ── DROPZONE ── */
 .dropz {
-  border: 1.5px dashed var(--border2);
+  border: 2px dashed var(--border2);
   border-radius: var(--r);
-  padding: 36px 20px;
+  padding: 48px 24px;
   text-align: center;
   cursor: pointer;
-  margin-bottom: 12px;
-  transition: border-color .2s, background .2s;
+  transition: all 0.25s;
   background: var(--surface);
+  position: relative;
+  overflow: hidden;
 }
-.dropz:hover { border-color: var(--accent); background: rgba(59,130,246,.04); }
-.dropz i { font-size: 32px; color: var(--text3); display: block; margin-bottom: 10px; }
-.dropz p { font-size: 14px; color: var(--text2); margin-bottom: 4px; }
-.dropz small { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.dropz::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(29,185,84,0.03), rgba(79,142,247,0.03));
+  opacity: 0; transition: opacity 0.25s;
+}
+.dropz:hover { border-color: var(--g1); }
+.dropz:hover::before { opacity: 1; }
+.dropz-icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 16px;
+  background: var(--card2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: var(--text2);
+}
+.dropz h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.dropz p { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+.dropz small { font-size: 11px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.06em; }
 
-/* ── SLIDERS ── */
-.slider-row {
+/* ── PROCESSOR SECTION ── */
+#processorSection { margin-top: 8px; }
+
+/* ── SECTION HEADER ── */
+.section-hdr {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 16px;
+  margin-top: 28px;
 }
-input[type=range] {
+.section-hdr-line {
+  flex: 1; height: 1px;
+  background: var(--border);
+}
+.section-hdr-label {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── WAVEFORM ── */
+.wave-wrap {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+canvas {
+  width: 100%; height: 64px;
+  display: block; border-radius: 8px;
+}
+
+/* ── INFO CHIPS ── */
+.chips-row {
+  display: none;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.chip {
   flex: 1;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r2);
+  padding: 14px 16px;
+}
+.chip-lbl {
+  font-size: 10px; font-family: var(--mono);
+  color: var(--text3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.chip-val {
+  font-size: 18px; font-weight: 800;
+  color: var(--text); font-family: var(--mono);
+}
+
+/* ── CONTROLS ── */
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ctrl-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.ctrl-card:hover { border-color: var(--border2); }
+.ctrl-card.full { grid-column: 1 / -1; }
+
+.ctrl-label {
+  font-size: 11px; font-family: var(--mono);
+  color: var(--text3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.ctrl-value {
+  font-size: 28px; font-weight: 900;
+  color: var(--text); line-height: 1;
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── RANGE ── */
+input[type=range] {
+  width: 100%;
   -webkit-appearance: none;
   height: 4px;
   border-radius: 2px;
@@ -387,395 +567,292 @@ input[type=range] {
 }
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px; height: 16px;
+  width: 18px; height: 18px;
   border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 6px rgba(59,130,246,.4);
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   cursor: pointer;
-  transition: transform .15s;
+  transition: transform 0.15s;
 }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-.val-badge {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--accent2);
-  min-width: 64px;
-  text-align: right;
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+.range-track {
+  position: relative;
+  margin-bottom: 8px;
 }
+
+.range-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; font-family: var(--mono);
+  color: var(--text3); margin-top: 4px;
+}
+
 input[type=number] {
-  width: 64px;
-  padding: 5px 8px;
-  background: var(--card2);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
   outline: none;
   text-align: center;
+  transition: border-color 0.2s;
+  margin-top: 8px;
 }
-input[type=number]:focus { border-color: var(--accent); }
+input[type=number]:focus { border-color: var(--g1); }
 
 /* ── FORMAT TOGGLE ── */
-.fmt-toggle {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 14px;
+.fmt-pills {
+  display: flex; gap: 6px; margin-bottom: 14px;
 }
-.fmt-btn {
-  flex: 1;
-  padding: 8px;
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text2);
-  transition: all .2s;
-  letter-spacing: .04em;
+.fmt-pill {
+  flex: 1; padding: 10px;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
+  cursor: pointer; border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: transparent; color: var(--text2);
+  transition: all 0.2s; letter-spacing: 0.04em;
 }
-.fmt-btn.active {
-  background: rgba(59,130,246,.12);
-  border-color: var(--accent);
-  color: var(--accent2);
+.fmt-pill.active {
+  background: #fff; border-color: #fff; color: #000;
 }
+
 select {
-  padding: 7px 12px;
-  background: var(--card2);
-  border: 1px solid var(--border2);
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
   outline: none;
   cursor: pointer;
 }
 
-/* ── WAVEFORM ── */
-canvas {
-  width: 100%;
-  height: 60px;
-  border-radius: 8px;
-  background: var(--surface);
-  display: block;
-  margin-bottom: 12px;
-  border: 1px solid var(--border);
-}
-
-/* ── INFO CHIPS ── */
-.info-row {
-  display: none;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.chip {
-  flex: 1;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-.chip-lbl { font-size: 9px; font-family: var(--mono); color: var(--text3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 3px; }
-.chip-val { font-size: 13px; font-weight: 600; color: var(--text); font-family: var(--mono); }
-
 /* ── PROGRESS ── */
+.progress-section {
+  margin: 20px 0;
+}
 .prog-wrap {
-  height: 4px;
+  height: 3px;
   background: var(--border);
-  border-radius: 2px;
-  margin: 14px 0 10px;
-  display: none;
+  border-radius: 100px;
   overflow: hidden;
+  display: none;
+  margin-bottom: 12px;
 }
 .prog-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  border-radius: 2px;
-  transition: width .25s;
+  background: linear-gradient(90deg, var(--g1), var(--blue));
+  border-radius: 100px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(29,185,84,0.5);
 }
 .status-txt {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text3);
-  text-align: center;
-  min-height: 18px;
-  margin: 8px 0;
+  font-family: var(--mono); font-size: 12px;
+  color: var(--text3); text-align: center;
+  min-height: 16px;
 }
 
 /* ── PROCESS BUTTON ── */
-.btn-process {
+.btn-main {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--accent), #1d4ed8);
-  border: none;
-  border-radius: var(--r);
-  color: #fff;
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: .04em;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--g1) 0%, #1a9e48 50%, var(--blue) 100%);
+  border: none; border-radius: var(--r);
+  color: #fff; font-family: var(--sans);
+  font-size: 16px; font-weight: 800;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: opacity .2s, transform .15s;
-  box-shadow: 0 4px 20px rgba(59,130,246,.25);
-  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 8px 32px rgba(29,185,84,0.3), 0 4px 16px rgba(0,0,0,0.3);
+  position: relative; overflow: hidden;
 }
-.btn-process:hover { opacity: .9; transform: translateY(-1px); }
-.btn-process:active { transform: translateY(0); }
-.btn-process:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.btn-main::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(29,185,84,0.4), 0 6px 20px rgba(0,0,0,0.4); }
+.btn-main:hover::before { opacity: 1; }
+.btn-main:active { transform: translateY(0); }
+.btn-main:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* ── OUTPUT CARDS ── */
-.out-section { margin-top: 20px; display: none; }
+/* ── OUTPUT SECTION ── */
+.out-section { margin-top: 24px; display: none; }
+.out-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
 .out-card {
   border-radius: var(--r);
-  padding: 16px;
-  margin-bottom: 12px;
-  border: 1px solid;
+  padding: 20px;
+  border: 1.5px solid;
+  position: relative;
+  overflow: hidden;
 }
-.out-a {
-  background: rgba(59,130,246,.06);
-  border-color: rgba(59,130,246,.25);
+.out-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
 }
-.out-b {
-  background: rgba(16,185,129,.06);
-  border-color: rgba(16,185,129,.25);
-}
-.out-label {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.out-a .out-label { color: var(--accent2); }
-.out-b .out-label { color: var(--green); }
-audio {
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  height: 40px;
-  accent-color: var(--accent);
-}
-.out-info {
+.out-a { background: rgba(29,185,84,0.05); border-color: rgba(29,185,84,0.2); }
+.out-a::before { background: linear-gradient(90deg, var(--g1), transparent); }
+.out-b { background: rgba(79,142,247,0.05); border-color: rgba(79,142,247,0.2); }
+.out-b::before { background: linear-gradient(90deg, var(--blue), transparent); }
+
+.out-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px; font-weight: 700;
   font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  margin-bottom: 8px;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
 }
+.out-a .out-badge { background: rgba(29,185,84,0.15); color: var(--g2); }
+.out-b .out-badge { background: rgba(79,142,247,0.15); color: #7eb3ff; }
+
+.out-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px;
+}
+.out-sub {
+  font-size: 11px; font-family: var(--mono);
+  color: var(--text3); margin-bottom: 14px;
+}
+
+audio {
+  width: 100%; border-radius: 8px;
+  margin-bottom: 10px; height: 36px;
+  accent-color: var(--g1);
+}
+
+.out-info {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text3); margin-bottom: 12px;
+}
+
 .btn-dl {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 9px;
-  border-radius: 8px;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid;
-  text-decoration: none;
-  transition: opacity .2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 10px;
+  border-radius: 8px; font-family: var(--sans);
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid;
+  text-decoration: none; transition: all 0.2s;
 }
-.btn-dl:hover { opacity: .8; }
-.btn-dl-a { background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.3); color: var(--accent2); }
-.btn-dl-b { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.3); color: var(--green); }
+.btn-dl:hover { transform: translateY(-1px); }
+.btn-dl-a { background: rgba(29,185,84,0.1); border-color: rgba(29,185,84,0.3); color: var(--g2); }
+.btn-dl-a:hover { background: rgba(29,185,84,0.2); }
+.btn-dl-b { background: rgba(79,142,247,0.1); border-color: rgba(79,142,247,0.3); color: #7eb3ff; }
+.btn-dl-b:hover { background: rgba(79,142,247,0.2); }
 
 /* ── EMPTY STATE ── */
 .empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text3);
+  text-align: center; padding: 72px 20px;
 }
-.empty i { font-size: 40px; display: block; margin-bottom: 12px; opacity: .4; }
-.empty p { font-size: 14px; }
+.empty-icon {
+  width: 80px; height: 80px;
+  margin: 0 auto 20px;
+  background: var(--card);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: var(--text3);
+}
+.empty h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.empty p { font-size: 14px; color: var(--text2); line-height: 1.6; }
 
-/* ── LOADING SKELETON ── */
-.skeleton {
+/* ── SKELETON ── */
+.skel {
   background: linear-gradient(90deg, var(--card) 25%, var(--card2) 50%, var(--card) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
+  animation: shimmer 1.5s infinite;
   border-radius: 6px;
 }
 .skel-card {
-  display: flex;
-  gap: 14px;
-  padding: 14px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  margin-bottom: 10px;
-}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .4; }
-}
-
-/* ── SELECTED TRACK BAR ── */
-.selected-track {
-  display: none;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(59,130,246,.08);
-  border: 1px solid rgba(59,130,246,.2);
-  border-radius: var(--r);
-  margin-bottom: 12px;
-  animation: fadeUp .3s ease;
-}
-.selected-track img {
-  width: 48px; height: 48px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-.selected-track-info { flex: 1; min-width: 0; }
-.selected-track-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.selected-track-meta {
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--text3);
-  margin-top: 2px;
-}
-.btn-clear {
-  background: none;
-  border: none;
-  color: var(--text3);
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px;
-  transition: color .2s;
-}
-.btn-clear:hover { color: var(--red); }
-
-/* ── URL INPUT ── */
-.url-input-wrap {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.url-input {
-  flex: 1;
-  padding: 11px 14px;
-  background: var(--card2);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12px;
-  outline: none;
-  transition: border-color .2s;
-}
-.url-input:focus { border-color: var(--accent); }
-.url-input::placeholder { color: var(--text3); }
-.btn-fetch {
-  padding: 11px 16px;
-  background: var(--accent);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity .2s;
-}
-.btn-fetch:hover { opacity: .85; }
-
-/* ── DIVIDER ── */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: var(--text3);
-  font-size: 11px;
-  font-family: var(--mono);
-  letter-spacing: .1em;
-}
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+  display: flex; gap: 16px; padding: 16px;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r); margin-bottom: 8px;
 }
 
 /* ── TOAST ── */
 .toast {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translateX(-50%) translateY(100px);
   background: var(--card2);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 12px 20px;
-  font-size: 13px;
+  border: 1.5px solid var(--border2);
+  border-radius: 100px;
+  padding: 14px 24px;
+  font-size: 14px; font-weight: 600;
   color: var(--text);
-  box-shadow: 0 8px 32px rgba(0,0,0,.4);
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-  z-index: 999;
-  white-space: nowrap;
-  font-family: var(--mono);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  z-index: 999; white-space: nowrap;
+  display: flex; align-items: center; gap: 10px;
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 
-@media (max-width: 600px) {
-  .result-thumb { width: 80px; height: 46px; }
-  .result-card { gap: 10px; }
-  .tabs { gap: 2px; }
-  .tab { font-size: 12px; padding: 9px 8px; }
+/* ── ANIMATIONS ── */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@media (max-width: 640px) {
+  .controls-grid { grid-template-columns: 1fr; }
+  .out-grid { grid-template-columns: 1fr; }
+  .tab { font-size: 12px; padding: 10px 12px; }
+  .ctrl-value { font-size: 22px; }
+  header { padding: 24px 0 32px; }
 }
 </style>
 </head>
 <body>
 
-<div class="bg-glow glow-1"></div>
-<div class="bg-glow glow-2"></div>
+<div class="ambient">
+  <div class="ambient-blob blob-1"></div>
+  <div class="ambient-blob blob-2"></div>
+  <div class="ambient-blob blob-3"></div>
+</div>
 
 <div class="wrap">
 
   <!-- HEADER -->
   <header>
     <div class="logo">
-      <div class="logo-icon"><i class="ti ti-wavesaw-mono"></i></div>
+      <div class="logo-mark"><i class="ti ti-wave-sine"></i></div>
       <div class="logo-text">
-        <span class="logo-name">Ever Dream Studio</span>
-        <span class="logo-sub">Audio Processing Suite</span>
+        <div class="name">Ever Dream Studio</div>
+        <div class="sub">Audio Processing Suite</div>
       </div>
     </div>
-    <div class="badge-live">ONLINE</div>
+    <div class="status-pill">
+      <span class="dot"></span>
+      Online
+    </div>
   </header>
 
   <!-- TABS -->
@@ -791,68 +868,74 @@ audio {
     </button>
   </div>
 
-  <!-- ══════════════ TAB: SEARCH ══════════════ -->
+  <!-- TAB: SEARCH -->
   <div class="panel active" id="panel-search">
     <div class="search-wrap">
       <i class="ti ti-search search-icon"></i>
       <input class="search-input" id="searchInput" type="text"
-        placeholder="Cari lagu, podcast, audio..."
+        placeholder="Cari lagu, podcast, atau audio..."
         onkeydown="if(event.key==='Enter')doSearch()">
       <button class="search-btn" onclick="doSearch()">Cari</button>
     </div>
-
     <div id="searchResults">
       <div class="empty">
-        <i class="ti ti-music-search"></i>
-        <p>Ketik judul lagu atau artis untuk mulai mencari</p>
+        <div class="empty-icon"><i class="ti ti-music-search"></i></div>
+        <h3>Mulai pencarian</h3>
+        <p>Ketik judul lagu atau nama artis<br>untuk mencari di YouTube</p>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════ TAB: UPLOAD ══════════════ -->
+  <!-- TAB: UPLOAD -->
   <div class="panel" id="panel-upload">
     <div class="dropz" id="dropZone" onclick="document.getElementById('fileIn').click()">
-      <i class="ti ti-file-music"></i>
-      <p id="dropLabel">Klik atau seret file audio ke sini</p>
+      <div class="dropz-icon"><i class="ti ti-file-music"></i></div>
+      <h3 id="dropLabel">Seret atau klik untuk upload</h3>
+      <p>Pilih file audio dari perangkat kamu</p>
       <small>MP3 · WAV · OGG · M4A · FLAC</small>
     </div>
     <input type="file" id="fileIn" accept="audio/*" style="display:none">
   </div>
 
-  <!-- ══════════════ TAB: URL ══════════════ -->
+  <!-- TAB: URL -->
   <div class="panel" id="panel-url">
-    <div class="card">
-      <p class="card-label">Link YouTube</p>
-      <div class="url-input-wrap">
+    <div class="url-panel-card">
+      <h3>Paste Link YouTube</h3>
+      <p>Masukkan URL video YouTube dan klik Muat untuk mengambil audio secara langsung.</p>
+      <div class="url-input-row">
         <input class="url-input" id="ytUrlInput" type="text" placeholder="https://www.youtube.com/watch?v=...">
-        <button class="btn-fetch" onclick="loadFromUrl()">
-          <i class="ti ti-download"></i> Muat
+        <button class="btn-load" onclick="loadFromUrl()">
+          <i class="ti ti-cloud-download"></i> Muat
         </button>
       </div>
-      <p style="font-size:11px;color:var(--text3);font-family:var(--mono)">
-        Paste link YouTube → audio akan diproses via backend
-      </p>
     </div>
   </div>
 
-  <!-- ══════════════ SELECTED TRACK ══════════════ -->
+  <!-- SELECTED TRACK -->
   <div class="selected-track" id="selectedTrack">
     <img id="selThumb" src="" alt="">
-    <div class="selected-track-info">
-      <div class="selected-track-title" id="selTitle">—</div>
-      <div class="selected-track-meta" id="selMeta">—</div>
+    <div class="sel-info">
+      <div class="sel-title" id="selTitle">—</div>
+      <div class="sel-meta" id="selMeta">—</div>
     </div>
     <button class="btn-clear" onclick="clearSelected()" title="Hapus pilihan">
       <i class="ti ti-x"></i>
     </button>
   </div>
 
-  <!-- ══════════════ PROCESSOR ══════════════ -->
+  <!-- PROCESSOR -->
   <div id="processorSection">
 
-    <canvas id="waveCanvas"></canvas>
+    <div class="section-hdr">
+      <span class="section-hdr-label">Waveform</span>
+      <div class="section-hdr-line"></div>
+    </div>
 
-    <div class="info-row" id="infoRow">
+    <div class="wave-wrap">
+      <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <div class="chips-row" id="infoRow">
       <div class="chip">
         <div class="chip-lbl">Durasi Asli</div>
         <div class="chip-val" id="infoDur">—</div>
@@ -867,125 +950,142 @@ audio {
       </div>
     </div>
 
-    <div class="card">
-      <p class="card-label">Kecepatan</p>
-      <div class="slider-row">
-        <input type="range" id="speedRange" min="0.2" max="3" step="0.01" value="2.3">
-        <span class="val-badge" id="speedVal">2.30×</span>
+    <div class="section-hdr">
+      <span class="section-hdr-label">Controls</span>
+      <div class="section-hdr-line"></div>
+    </div>
+
+    <div class="controls-grid">
+      <!-- Speed -->
+      <div class="ctrl-card">
+        <div class="ctrl-label">
+          <span>Kecepatan</span>
+          <i class="ti ti-player-fast-forward" style="font-size:14px;color:var(--g1)"></i>
+        </div>
+        <div class="ctrl-value" id="speedVal">2.30×</div>
+        <div class="range-track">
+          <input type="range" id="speedRange" min="0.2" max="3" step="0.01" value="2.3">
+        </div>
+        <div class="range-labels"><span>0.2×</span><span>3×</span></div>
         <input type="number" id="speedNum" min="0.1" max="10" step="0.01" value="2.3">
       </div>
-    </div>
 
-    <div class="card">
-      <p class="card-label">Amplifikasi</p>
-      <div class="slider-row">
-        <input type="range" id="dbRange" min="-20" max="20" step="0.5" value="0">
-        <span class="val-badge" id="dbVal">0.0 dB</span>
+      <!-- Amplifikasi -->
+      <div class="ctrl-card">
+        <div class="ctrl-label">
+          <span>Amplifikasi</span>
+          <i class="ti ti-wave-square" style="font-size:14px;color:var(--blue)"></i>
+        </div>
+        <div class="ctrl-value" id="dbVal">0.0 dB</div>
+        <div class="range-track">
+          <input type="range" id="dbRange" min="-20" max="20" step="0.5" value="0">
+        </div>
+        <div class="range-labels"><span>-20dB</span><span>+20dB</span></div>
         <input type="number" id="dbNum" min="-40" max="40" step="0.5" value="0">
       </div>
-    </div>
 
-    <div class="card">
-      <p class="card-label">Durasi Maks (detik)</p>
-      <div class="slider-row">
-        <input type="range" id="durRange" min="10" max="600" step="5" value="400">
-        <span class="val-badge" id="durVal">400s</span>
+      <!-- Durasi Maks -->
+      <div class="ctrl-card">
+        <div class="ctrl-label">
+          <span>Durasi Maks</span>
+          <i class="ti ti-clock" style="font-size:14px;color:var(--purple)"></i>
+        </div>
+        <div class="ctrl-value" id="durVal">400s</div>
+        <div class="range-track">
+          <input type="range" id="durRange" min="10" max="600" step="5" value="400">
+        </div>
+        <div class="range-labels"><span>10s</span><span>600s</span></div>
         <input type="number" id="durNum" min="1" max="3600" step="1" value="400">
       </div>
-    </div>
 
-    <div class="card">
-      <p class="card-label">Format Output</p>
-      <div class="fmt-toggle">
-        <button class="fmt-btn active" id="fmtMp3" onclick="setFmt('mp3')">MP3</button>
-        <button class="fmt-btn" id="fmtWav" onclick="setFmt('wav')">WAV</button>
-      </div>
-      <div id="mp3Opts">
-        <div class="slider-row" style="margin:0">
-          <span style="font-size:12px;color:var(--text2);flex:1;font-family:var(--mono)">Bitrate</span>
+      <!-- Format -->
+      <div class="ctrl-card">
+        <div class="ctrl-label">
+          <span>Format Output</span>
+          <i class="ti ti-file-music" style="font-size:14px;color:var(--orange)"></i>
+        </div>
+        <div class="fmt-pills">
+          <button class="fmt-pill active" id="fmtMp3" onclick="setFmt('mp3')">MP3</button>
+          <button class="fmt-pill" id="fmtWav" onclick="setFmt('wav')">WAV</button>
+        </div>
+        <div id="mp3Opts">
           <select id="bitrateSelect">
             <option value="64">64 kbps</option>
             <option value="128" selected>128 kbps</option>
             <option value="192">192 kbps</option>
-            <option value="320">320 kbps</option>
+            <option value="320">320 kbps — Best</option>
           </select>
         </div>
       </div>
     </div>
 
-    <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
-    <p class="status-txt" id="statusTxt">Pilih audio untuk mulai</p>
+    <div class="progress-section">
+      <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
+      <p class="status-txt" id="statusTxt">Pilih audio untuk mulai</p>
+    </div>
 
-    <button class="btn-process" id="processBtn" disabled>
-      <i class="ti ti-wand"></i> Proses Kedua Output Sekaligus
+    <button class="btn-main" id="processBtn" disabled>
+      <i class="ti ti-sparkles"></i>
+      Proses Kedua Output Sekaligus
     </button>
 
+    <!-- OUTPUT -->
     <div class="out-section" id="resultSection">
-      <div class="out-card out-a">
-        <div class="out-label">
-          <i class="ti ti-player-fast-forward"></i>
-          Output A — Speed <span id="labelSpeedA">2.30×</span> + EQ · Compressor · Norm
-        </div>
-        <audio id="previewA" controls></audio>
-        <p class="out-info" id="infoA"></p>
-        <a id="dlA" style="text-decoration:none">
-          <button class="btn-dl btn-dl-a" type="button">
-            <i class="ti ti-download"></i> Download Output A
-          </button>
-        </a>
+      <div class="section-hdr" style="margin-top:28px">
+        <span class="section-hdr-label">Hasil</span>
+        <div class="section-hdr-line"></div>
       </div>
-      <div class="out-card out-b">
-        <div class="out-label">
-          <i class="ti ti-music"></i>
-          Output B — Durasi Asli + EQ · Compressor · Norm
+      <div class="out-grid">
+        <div class="out-card out-a">
+          <div class="out-badge"><i class="ti ti-player-fast-forward" style="font-size:10px"></i> OUTPUT A</div>
+          <div class="out-title">Speed + EQ + Compressor</div>
+          <div class="out-sub">Speed <span id="labelSpeedA">2.30×</span> · Normalized</div>
+          <audio id="previewA" controls></audio>
+          <p class="out-info" id="infoA"></p>
+          <a id="dlA" style="text-decoration:none">
+            <button class="btn-dl btn-dl-a" type="button">
+              <i class="ti ti-download"></i> Download A
+            </button>
+          </a>
         </div>
-        <audio id="previewB" controls></audio>
-        <p class="out-info" id="infoB"></p>
-        <a id="dlB" style="text-decoration:none">
-          <button class="btn-dl btn-dl-b" type="button">
-            <i class="ti ti-download"></i> Download Output B
-          </button>
-        </a>
+        <div class="out-card out-b">
+          <div class="out-badge"><i class="ti ti-music" style="font-size:10px"></i> OUTPUT B</div>
+          <div class="out-title">Durasi Asli + EQ</div>
+          <div class="out-sub">Original duration · Normalized</div>
+          <audio id="previewB" controls></audio>
+          <p class="out-info" id="infoB"></p>
+          <a id="dlB" style="text-decoration:none">
+            <button class="btn-dl btn-dl-b" type="button">
+              <i class="ti ti-download"></i> Download B
+            </button>
+          </a>
+        </div>
       </div>
     </div>
 
   </div><!-- /processorSection -->
-
 </div><!-- /wrap -->
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────────
-//  CONFIG
-// ─────────────────────────────────────────────────
 const API = 'https://web-production-3ff2c.up.railway.app';
 
-// ─────────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────────
 let audioBuffer = null;
 let fmt = 'mp3';
-let selectedYT = null; // { url, title, channel, duration, thumbnail }
-let ytAudioBlob = null;
-
+let selectedYT = null;
 const $ = id => document.getElementById(id);
 
-// ─────────────────────────────────────────────────
-//  TABS
-// ─────────────────────────────────────────────────
+// ── TABS ──
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t, i) => {
-    const names = ['search','upload','url'];
-    t.classList.toggle('active', names[i] === name);
+    t.classList.toggle('active', ['search','upload','url'][i] === name);
   });
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   $(`panel-${name}`).classList.add('active');
 }
 
-// ─────────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────────
+// ── TOAST ──
 function toast(msg, dur = 3000) {
   const el = $('toast');
   el.textContent = msg;
@@ -993,26 +1093,21 @@ function toast(msg, dur = 3000) {
   setTimeout(() => el.classList.remove('show'), dur);
 }
 
-// ─────────────────────────────────────────────────
-//  SEARCH
-// ─────────────────────────────────────────────────
+// ── SEARCH ──
 async function doSearch() {
   const q = $('searchInput').value.trim();
   if (!q) return;
-
   const el = $('searchResults');
-  el.innerHTML = `
-    ${[1,2,3,4].map(() => `
-      <div class="skel-card">
-        <div class="skeleton" style="width:120px;height:68px;border-radius:8px;flex-shrink:0"></div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:4px 0">
-          <div class="skeleton" style="height:14px;width:85%"></div>
-          <div class="skeleton" style="height:14px;width:60%"></div>
-          <div class="skeleton" style="height:11px;width:40%"></div>
-        </div>
+  el.innerHTML = [1,2,3,4].map(() => `
+    <div class="skel-card">
+      <div class="skel" style="width:112px;height:64px;border-radius:8px;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:4px 0">
+        <div class="skel" style="height:14px;width:80%"></div>
+        <div class="skel" style="height:13px;width:55%"></div>
+        <div class="skel" style="height:11px;width:35%"></div>
       </div>
-    `).join('')}
-  `;
+    </div>
+  `).join('');
 
   try {
     const res = await fetch(`${API}/search?q=${encodeURIComponent(q)}&limit=10`);
@@ -1020,32 +1115,32 @@ async function doSearch() {
     const data = await res.json();
 
     if (!data.results || data.results.length === 0) {
-      el.innerHTML = `<div class="empty"><i class="ti ti-search-off"></i><p>Tidak ada hasil untuk "${q}"</p></div>`;
+      el.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ti ti-search-off"></i></div><h3>Tidak ada hasil</h3><p>Coba kata kunci lain untuk "${escHtml(q)}"</p></div>`;
       return;
     }
 
     el.innerHTML = `
       <div class="results-header">
         <span class="results-label">Hasil Pencarian</span>
-        <span class="results-count">${data.count} hasil</span>
+        <span class="results-count">${data.results.length} video</span>
       </div>
       <div class="result-list">
         ${data.results.map((r, i) => `
-          <div class="result-card" id="rc-${i}" style="animation-delay:${i*0.04}s">
+          <div class="result-card" id="rc-${i}" style="animation:fadeUp 0.4s ${i*0.05}s cubic-bezier(0.16,1,0.3,1) both">
             <img class="result-thumb" src="${r.thumbnail}" alt="" onerror="this.src='https://i.ytimg.com/vi/default/mqdefault.jpg'">
             <div class="result-info">
               <div class="result-title">${escHtml(r.title)}</div>
               <div class="result-meta">
                 <span><i class="ti ti-user" style="font-size:10px"></i>${escHtml(r.channel || '—')}</span>
-                <span><i class="ti ti-clock" style="font-size:10px"></i>${r.duration}</span>
+                <span><i class="ti ti-clock" style="font-size:10px"></i>${fmtDur(r.duration)}</span>
                 ${r.view_count ? `<span><i class="ti ti-eye" style="font-size:10px"></i>${fmtViews(r.view_count)}</span>` : ''}
               </div>
-              <div class="result-action">
-                <button class="btn-use" onclick="selectYT(${i}, ${JSON.stringify(r).replace(/"/g,'&quot;')})">
-                  <i class="ti ti-wand"></i> Proses
+              <div class="result-actions">
+                <button class="btn-process-sm" onclick="selectYT(${i}, ${JSON.stringify(r).replace(/"/g,'&quot;')})">
+                  <i class="ti ti-sparkles"></i> Proses
                 </button>
-                <a class="btn-dl-direct" href="${API}/audio?url=${encodeURIComponent(r.url)}&quality=128" download>
-                  <i class="ti ti-download"></i> DL MP3
+                <a class="btn-dl-sm" href="${API}/audio?url=${encodeURIComponent(r.url)}" download>
+                  <i class="ti ti-download"></i> MP3
                 </a>
               </div>
             </div>
@@ -1054,26 +1149,31 @@ async function doSearch() {
       </div>
     `;
   } catch(e) {
-    el.innerHTML = `<div class="empty"><i class="ti ti-wifi-off"></i><p>Gagal menghubungi server: ${e.message}</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><h3>Gagal terhubung</h3><p>${e.message}</p></div>`;
   }
 }
 
 function escHtml(s) {
+  if (!s) return '';
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function fmtViews(n) {
-  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B views';
-  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M views';
-  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K views';
-  return n + ' views';
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return n + '';
 }
 
-// ─────────────────────────────────────────────────
-//  SELECT YT TRACK → fetch audio via backend → AudioBuffer
-// ─────────────────────────────────────────────────
+function fmtDur(sec) {
+  if (!sec) return '—';
+  sec = parseInt(sec);
+  const m = Math.floor(sec/60), s = sec%60;
+  return m + ':' + String(s).padStart(2,'0');
+}
+
+// ── SELECT YT TRACK ──
 async function selectYT(idx, r) {
-  // highlight card
   document.querySelectorAll('.result-card').forEach(c => c.classList.remove('selected'));
   const card = $(`rc-${idx}`);
   if (card) card.classList.add('selected');
@@ -1085,7 +1185,6 @@ async function selectYT(idx, r) {
   setP(10, 'Mendapatkan stream URL...');
 
   try {
-    // Step 1: get direct stream URL from backend (fast, no download)
     const infoRes = await fetch(`${API}/stream-url?url=${encodeURIComponent(r.url)}`);
     if (!infoRes.ok) {
       const err = await infoRes.json().catch(() => ({}));
@@ -1093,16 +1192,13 @@ async function selectYT(idx, r) {
     }
     const info = await infoRes.json();
 
-    // Update selected track display with real info
     if (info.title) {
       $('selTitle').textContent = info.title;
-      $('selMeta').textContent = (info.channel || '') + (info.duration ? ' · ' + info.duration : '');
+      $('selMeta').textContent = (info.channel || '') + (info.duration ? ' · ' + fmtDur(info.duration) : '');
       if (info.thumbnail) $('selThumb').src = info.thumbnail;
     }
 
-    setP(30, 'Mengunduh audio langsung...');
-
-    // Step 2: fetch audio directly from YouTube CDN stream URL
+    setP(30, 'Mengunduh audio...');
     const audioRes = await fetch(info.stream_url);
     if (!audioRes.ok) throw new Error(`Stream fetch gagal: ${audioRes.status}`);
 
@@ -1111,13 +1207,12 @@ async function selectYT(idx, r) {
     const actx = new (window.AudioContext || window.webkitAudioContext)();
     audioBuffer = await actx.decodeAudioData(arrayBuf);
 
-    setP(100, 'Siap — ' + audioBuffer.duration.toFixed(1) + 's');
+    setP(100, '✓ Siap — ' + audioBuffer.duration.toFixed(1) + 's');
     $('progWrap').style.display = 'none';
     $('processBtn').disabled = false;
-    updateInfo();
-    drawWaveform(audioBuffer);
-    toast('✅ Audio berhasil dimuat — siap diproses!');
-    setTimeout(() => $('processorSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+    updateInfo(); drawWaveform(audioBuffer);
+    toast('✅ Audio berhasil dimuat!');
+    setTimeout(() => $('processorSection').scrollIntoView({ behavior:'smooth', block:'start' }), 200);
   } catch(e) {
     setP(0, '');
     $('progWrap').style.display = 'none';
@@ -1129,13 +1224,12 @@ async function selectYT(idx, r) {
 function showSelectedTrack(r) {
   $('selThumb').src = r.thumbnail || '';
   $('selTitle').textContent = r.title || r.url;
-  $('selMeta').textContent = (r.channel || '') + (r.duration ? ' · ' + r.duration : '');
+  $('selMeta').textContent = (r.channel || '') + (r.duration ? ' · ' + fmtDur(r.duration) : '');
   $('selectedTrack').style.display = 'flex';
 }
 
 function clearSelected() {
-  selectedYT = null;
-  audioBuffer = null;
+  selectedYT = null; audioBuffer = null;
   $('selectedTrack').style.display = 'none';
   $('processBtn').disabled = true;
   $('resultSection').style.display = 'none';
@@ -1144,26 +1238,23 @@ function clearSelected() {
   document.querySelectorAll('.result-card').forEach(c => c.classList.remove('selected'));
 }
 
-// ─────────────────────────────────────────────────
-//  LOAD FROM URL TAB
-// ─────────────────────────────────────────────────
+// ── LOAD FROM URL ──
 async function loadFromUrl() {
   const url = $('ytUrlInput').value.trim();
-  if (!url) return toast('Masukkan URL YouTube dulu');
+  if (!url) return toast('⚠️ Masukkan URL YouTube dulu');
+  const ytRegex = /(?:v=|youtu\.be\/|shorts\/)([a-zA-Z0-9_-]{11})/;
+  if (!ytRegex.test(url)) return toast('❌ URL tidak valid');
   await selectYT(-1, { url, title: url, channel: '', duration: '', thumbnail: '' });
 }
 
-// ─────────────────────────────────────────────────
-//  FILE UPLOAD
-// ─────────────────────────────────────────────────
-$('dropZone').addEventListener('dragover', e => e.preventDefault());
+// ── FILE UPLOAD ──
+$('dropZone').addEventListener('dragover', e => { e.preventDefault(); $('dropZone').style.borderColor = 'var(--g1)'; });
+$('dropZone').addEventListener('dragleave', () => { $('dropZone').style.borderColor = ''; });
 $('dropZone').addEventListener('drop', e => {
-  e.preventDefault();
+  e.preventDefault(); $('dropZone').style.borderColor = '';
   if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
 });
-$('fileIn').addEventListener('change', e => {
-  if (e.target.files[0]) loadFile(e.target.files[0]);
-});
+$('fileIn').addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 
 async function loadFile(file) {
   setStatus('Memuat...');
@@ -1175,14 +1266,10 @@ async function loadFile(file) {
     setStatus('Siap — ' + audioBuffer.duration.toFixed(1) + 's');
     $('processBtn').disabled = false;
     $('resultSection').style.display = 'none';
-  } catch(e) {
-    setStatus('Gagal membaca file');
-  }
+  } catch(e) { setStatus('Gagal membaca file'); }
 }
 
-// ─────────────────────────────────────────────────
-//  SLIDERS
-// ─────────────────────────────────────────────────
+// ── SLIDERS ──
 function syncPair(rId, nId, dId, fn) {
   const r = $(rId), n = $(nId), d = $(dId);
   const upd = v => { d.textContent = fn(parseFloat(v)); updateInfo(); };
@@ -1204,9 +1291,7 @@ function updateInfo() {
   $('infoRow').style.display = 'flex';
 }
 
-// ─────────────────────────────────────────────────
-//  FORMAT
-// ─────────────────────────────────────────────────
+// ── FORMAT ──
 function setFmt(f) {
   fmt = f;
   $('fmtMp3').classList.toggle('active', f === 'mp3');
@@ -1215,36 +1300,34 @@ function setFmt(f) {
 }
 setFmt('mp3');
 
-// ─────────────────────────────────────────────────
-//  WAVEFORM
-// ─────────────────────────────────────────────────
+// ── WAVEFORM ──
 function drawWaveform(buf) {
   const cv = $('waveCanvas'), ctx = cv.getContext('2d');
-  cv.width = cv.offsetWidth * 2; cv.height = 120;
+  cv.width = cv.offsetWidth * 2; cv.height = 128;
   const data = buf.getChannelData(0), step = Math.ceil(data.length / cv.width), h = cv.height / 2;
   ctx.clearRect(0, 0, cv.width, cv.height);
   for (let x = 0; x < cv.width; x++) {
     let mx = 0;
-    for (let j = 0; j < step; j++) { const v = Math.abs(data[x*step+j]||0); if(v>mx) mx=v; }
-    const alpha = 0.4 + mx * 0.6;
-    ctx.strokeStyle = `rgba(59,130,246,${alpha})`;
-    ctx.lineWidth = 1;
+    for (let j = 0; j < step; j++) { const v = Math.abs(data[x*step+j]||0); if(v>mx)mx=v; }
+    const grad = ctx.createLinearGradient(0, h - mx*h*0.9, 0, h + mx*h*0.9);
+    grad.addColorStop(0, `rgba(29,185,84,${0.3 + mx * 0.7})`);
+    grad.addColorStop(1, `rgba(79,142,247,${0.3 + mx * 0.7})`);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x, h - mx*h*0.88);
-    ctx.lineTo(x, h + mx*h*0.88);
+    ctx.moveTo(x, h - mx*h*0.9);
+    ctx.lineTo(x, h + mx*h*0.9);
     ctx.stroke();
   }
 }
 
-// ─────────────────────────────────────────────────
-//  PROCESS
-// ─────────────────────────────────────────────────
+// ── PROCESS ──
 $('processBtn').addEventListener('click', async () => {
   if (!audioBuffer) return;
   $('processBtn').disabled = true;
   $('resultSection').style.display = 'none';
   $('progWrap').style.display = 'block';
-  setP(5, 'Menyiapkan...');await tick(40);
+  setP(5, 'Menyiapkan...'); await tick(40);
 
   const speed = parseFloat($('speedNum').value);
   const db = parseFloat($('dbNum').value);
@@ -1277,9 +1360,9 @@ $('processBtn').addEventListener('click', async () => {
   $('previewB').src = urlB; $('dlB').href = urlB; $('dlB').download = 'output_B_original.' + ext;
   $('labelSpeedA').textContent = speed.toFixed(2) + '×';
   $('infoA').textContent = outSecA.toFixed(2) + 's · ' + fmtSize(blobA.size);
-  $('infoB').textContent = audioBuffer.duration.toFixed(2) + 's (asli) · ' + fmtSize(blobB.size);
+  $('infoB').textContent = audioBuffer.duration.toFixed(2) + 's · ' + fmtSize(blobB.size);
 
-  setP(100, '✅ Selesai!');
+  setP(100, '✓ Selesai!');
   $('resultSection').style.display = 'block';
   $('processBtn').disabled = false;
   setTimeout(() => $('resultSection').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
@@ -1290,13 +1373,8 @@ function fmtSize(b) {
   return b > 1048576 ? (b/1048576).toFixed(2)+' MB' : (b/1024).toFixed(0)+' KB';
 }
 
-// ─────────────────────────────────────────────────
-//  AUDIO DSP
-// ─────────────────────────────────────────────────
-function setP(pct, msg) {
-  $('progBar').style.width = pct + '%';
-  $('statusTxt').textContent = msg;
-}
+// ── DSP ──
+function setP(pct, msg) { $('progBar').style.width = pct + '%'; $('statusTxt').textContent = msg; }
 function setStatus(msg) { $('statusTxt').textContent = msg; }
 function tick(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -1326,7 +1404,7 @@ async function applyFx(srcBuf, gain, sr, nc, outLen) {
   let peak = 0;
   for (let c=0; c<rendered.numberOfChannels; c++) {
     const d = rendered.getChannelData(c);
-    for (let i=0; i<d.length; i++) { const v=Math.abs(d[i]); if(v>peak) peak=v; }
+    for (let i=0; i<d.length; i++) { const v=Math.abs(d[i]); if(v>peak)peak=v; }
   }
   if (peak > 0.001 && peak < 0.97) {
     const ng = 0.95/peak;
