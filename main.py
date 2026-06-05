@@ -64,7 +64,7 @@ def base_ydl_opts():
         'cookiefile': get_cookie_file(),
         'extractor_args': {
             'youtube': {
-                'player_client': ['web', 'tv_embedded', 'ios'],
+                'player_client': ['ios', 'android', 'tv_embedded'],
             }
         },
         'http_headers': {
