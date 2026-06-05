@@ -4,27 +4,37 @@ from fastapi.responses import StreamingResponse, JSONResponse
 import yt_dlp, os, re, httpx, tempfile, shutil, subprocess
 
 def find_ffmpeg():
-    # Coba which dulu
+    # 1. which
     path = shutil.which('ffmpeg')
     if path:
+        print(f"[ffmpeg] found via which: {path}")
         return os.path.dirname(path)
-    # Coba path umum Nix di Railway
-    for p in ['/usr/bin', '/usr/local/bin', '/nix/var/nix/profiles/default/bin', '/root/.nix-profile/bin']:
+    # 2. common paths
+    for p in ['/usr/local/bin', '/usr/bin', '/bin',
+              '/nix/var/nix/profiles/default/bin',
+              '/root/.nix-profile/bin']:
         if os.path.exists(os.path.join(p, 'ffmpeg')):
+            print(f"[ffmpeg] found at: {p}")
             return p
-    # Coba find
-    try:
-        result = subprocess.run(['find', '/nix', '-name', 'ffmpeg', '-type', 'f'], 
-                                capture_output=True, text=True, timeout=5)
-        lines = [l.strip() for l in result.stdout.strip().split('\n') if l.strip()]
-        if lines:
-            return os.path.dirname(lines[0])
-    except Exception:
-        pass
+    # 3. find in /nix
+    for search_dir in ['/nix', '/usr']:
+        try:
+            result = subprocess.run(
+                ['find', search_dir, '-name', 'ffmpeg', '-type', 'f'],
+                capture_output=True, text=True, timeout=10
+            )
+            lines = [l.strip() for l in result.stdout.strip().split('\n') if l.strip()]
+            if lines:
+                found = lines[0]
+                print(f"[ffmpeg] found via find: {found}")
+                return os.path.dirname(found)
+        except Exception as e:
+            print(f"[ffmpeg] find error in {search_dir}: {e}")
+    print("[ffmpeg] NOT FOUND anywhere!")
     return None
 
 FFMPEG_PATH = find_ffmpeg()
-print(f"[startup] ffmpeg location: {FFMPEG_PATH}")
+print(f"[startup] FFMPEG_PATH = {FFMPEG_PATH}")
 
 app = FastAPI()
 
