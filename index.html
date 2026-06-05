@@ -1199,7 +1199,16 @@ async function selectYT(idx, r) {
     }
 
     setP(30, 'Mengunduh audio...');
-    const audioRes = await fetch(info.stream_url);
+    // Coba stream langsung dulu, kalau CORS error pakai proxy
+    let audioRes;
+    try {
+      audioRes = await fetch(info.stream_url);
+      if (!audioRes.ok) throw new Error("direct failed");
+    } catch(_) {
+      // Fallback: pakai backend proxy
+      audioRes = await fetch(`${API}/proxy-audio?url=${encodeURIComponent(r.url)}`);
+      if (!audioRes.ok) throw new Error(`Proxy gagal: ${audioRes.status}`);
+    }
     if (!audioRes.ok) throw new Error(`Stream fetch gagal: ${audioRes.status}`);
 
     setP(70, 'Mendekode audio...');
